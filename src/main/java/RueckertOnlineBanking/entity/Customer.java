@@ -2,10 +2,7 @@ package RueckertOnlineBanking.entity;
 
 import RueckertOnlineBanking.entity.util.GeneratedIdEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,10 +13,10 @@ public class Customer extends GeneratedIdEntity {
 
     private String firstname;
     private String lastname;
-    @OneToMany
+    @OneToMany(cascade= CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<EMailAddress> eMailAddresses;
     private int phoneNumber;
-    private Date dateOfBirth;
+    private String dateOfBirth;
     @OneToOne
     private Address address;
     @OneToOne
@@ -31,33 +28,27 @@ public class Customer extends GeneratedIdEntity {
 
 
 
-
     public Customer(){
-
         super.id = getId();
+        this.eMailAddresses = new ArrayList<>();
+        this.accounts = new ArrayList<>();
+        this.tanNumbers = new ArrayList<>();
     }
 
-    public Customer(String firstname, String lastname, EMailAddress emailAddress, int phoneNumber, Date dateOfBirth, Address address, Account account){
+    public Customer(String firstname, String lastname, EMailAddress emailAddress, int phoneNumber, String dateOfBirth, Address address){
         super.id = getId();
         this.firstname = firstname;
         this.lastname = lastname;
-        this.eMailAddresses = new ArrayList<EMailAddress>();
+        this.eMailAddresses = new ArrayList<>();
         this.eMailAddresses.add(emailAddress);
         this.phoneNumber = phoneNumber;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
-        this.accounts = new ArrayList<Account>();
-        this.accounts.add(account);
+        this.accounts = new ArrayList<>();
 
-        this.pinNumber = new PIN();
-        this.tanNumbers = new ArrayList<TAN>();
-        this.fillTanNumbersList();
-        this.sendTanNumbersListToEmail();
-    }
-
-    public Customer(String firstname, String lastname) {
-        this.firstname = firstname;
-        this.lastname = lastname;
+        this.tanNumbers = new ArrayList<>();
+        //this.fillTanNumbersList();
+        //this.sendTanNumbersListToEmail();
     }
 
     private void fillTanNumbersList() {
@@ -79,7 +70,7 @@ public class Customer extends GeneratedIdEntity {
                 " Lastname: " +
                 this.lastname +
                 " E-Mail Addresses: " +
-                this.eMailAddresses +
+                this.printEmailAddresses() +
                 " Phone Number: " +
                 this.phoneNumber +
                 " Date of Birth: " +
@@ -118,6 +109,14 @@ public class Customer extends GeneratedIdEntity {
         }
     }
 
+    private String printEmailAddresses() {
+        String result = "";
+        for(int i = 0; i < this.eMailAddresses.size(); i++) {
+            result += eMailAddresses.get(i).toString();
+        }
+        return result;
+    }
+
     ///// GETTERS AND SETTERS /////
     public Long getId() {
         return super.getId();
@@ -145,11 +144,15 @@ public class Customer extends GeneratedIdEntity {
     }
     public void addEmailAddress(EMailAddress eMailAddress)
     {
+
         this.eMailAddresses.add(eMailAddress);
     }
     public void removeEmailAddress(EMailAddress eMailAddress) {
 
         this.eMailAddresses.remove(eMailAddress);
+    }
+    public List<EMailAddress> geteMailAddresses() {
+        return this.eMailAddresses;
     }
     public int getPhoneNumber() {
 
@@ -159,11 +162,11 @@ public class Customer extends GeneratedIdEntity {
 
         this.phoneNumber = phoneNumber;
     }
-    public Date getDateOfBirth() {
+    public String getDateOfBirth() {
 
         return this.dateOfBirth;
     }
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(String dateOfBirth) {
 
         this.dateOfBirth = dateOfBirth;
     }

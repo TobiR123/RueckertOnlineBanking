@@ -13,19 +13,17 @@ public class Address extends GeneratedIdEntity {
     private String houseNumber;
     private int postcode;
     private String place;
-    private Country country;
 
     public Address() {
         super.id = getId();
     }
 
-    public Address(String street, String houseNumber, int postcode, String place, Country country) {
+    public Address(String street, String houseNumber, int postcode, String place) {
         super.id = getId();
         this.street = street;
         this.houseNumber = houseNumber;
         this.postcode = postcode;
         this.place = place;
-        this.country = country;
     }
 
     @Override
@@ -92,13 +90,5 @@ public class Address extends GeneratedIdEntity {
     }
     public void setPlace(String place) {
         this.place = place;
-    }
-
-    public Country getCountry() {
-        return country;
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
     }
 }

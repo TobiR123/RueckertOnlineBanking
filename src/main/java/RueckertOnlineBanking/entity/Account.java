@@ -5,9 +5,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import RueckertOnlineBanking.entity.util.GeneratedIdEntity;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import java.util.Objects;
+import java.util.Random;
 
 @Entity
 public class Account extends GeneratedIdEntity {
@@ -15,21 +14,20 @@ public class Account extends GeneratedIdEntity {
     private String iban;
     private String bic;
     private int bankCode;
-    private int accountNumber;
+    private long accountNumber;
     private double credit;
-    @ManyToOne
-    private Customer customer;
+    //@ManyToOne
+    //private Customer customer;
+
 
     public Account() {
-        super.id = getId();
-    }
-
-    public Account(Customer customer) {
         super.id = getId();
         this.bankCode = this.instantiateBankCode();
         this.accountNumber = this.generateAccountNumber();
         this.bic = "RUOBDE01"; // BIC stands for "Rueckert Online Banking DE 01".
         this.iban = this.generateIban();
+        this.credit = 0.0;
+        //this.customer = customer;
     }
 
     private int instantiateBankCode() {
@@ -40,24 +38,31 @@ public class Account extends GeneratedIdEntity {
         return 71319472;
     }
 
-    private int generateAccountNumber() {
+    private long generateAccountNumber() {
         // Account Number consists of 10 digits.
         String accountNumberString = "";
         for(int i = 0; i < 10; i++) {
             // .nextInt() is exclusive the top number, so add 1 to make it inclusive.
-            int generatedDigit = ThreadLocalRandom.current().nextInt(0, 10);
-            accountNumberString = accountNumberString + Integer.toString(generatedDigit);
+            Random randomNum = new Random();
+            int generatedDigit = randomNum.nextInt(10);
+            // The first digit should not be 0.
+            if(generatedDigit == 0 && i == 0){
+                generatedDigit = 1;
+            }
+            accountNumberString += Integer.toString(generatedDigit);
         }
 
         // TODO: In DB nachschauen, obs Kontonummer schon gibt! Wenn ja, neue erstellen!
 
-        return Integer.getInteger(accountNumberString);
+        return Long.parseLong(accountNumberString);
     }
 
     private String generateIban() {
         // generate an iban from a known bank code and account number.
         long checksum = this.generateChecksum();
-        return "DE" + String.valueOf(checksum) + String.valueOf(this.bankCode) + String.valueOf(this.accountNumber);
+
+        String iban = "DE" + String.valueOf(checksum) + String.valueOf(this.bankCode) + String.valueOf(this.accountNumber);
+        return iban;
     }
 
     private long generateChecksum() {
@@ -65,7 +70,7 @@ public class Account extends GeneratedIdEntity {
         // For details, visit: https://www.sparkonto.org/manuelles-berechnen-der-iban-pruefziffer-sepa/
 
         // For DE, 1314 will be set directly.
-        String start = Integer.toString(this.bankCode) + Integer.toString(this.accountNumber) + "131400";
+        String start = Integer.toString(this.bankCode) + String.valueOf(this.accountNumber) + "131400";
 
         Long block1 = Long.parseLong(start.substring(0, 9));
         Long block2 = Long.parseLong(start.substring(9, 16));
@@ -74,28 +79,96 @@ public class Account extends GeneratedIdEntity {
 
         Long difference1 = block1 - ((block1/97)*97);
         if(String.valueOf(difference1).length() == 1) {
-            difference1 = Long.getLong("0" + String.valueOf(difference1));
+            String difference1Text = String.valueOf(difference1);
+            String concatenate1 = "0" + difference1Text;
+            difference1 = Long.getLong(concatenate1);
         }
 
-        String block2Concatenated = String.valueOf(difference1) + String.valueOf(block2);
+        String a = String.valueOf(difference1);
+        if(a == null){
+            System.out.println("a ist null");
+            a = "0";
+        }
+        String b = String.valueOf(block2);
+        String block2Concatenated = a + b;
+        System.out.println("Block 2 Concatenated: " + block2Concatenated + " 1: " + a + " 2: " + b);
 
-        Long difference2 = Long.getLong(block2Concatenated) - ((Long.getLong(block2Concatenated)/97)*97);
+
+        if(block2Concatenated.startsWith("null")){
+            String tmpNum = block2Concatenated.substring(4);
+            block2Concatenated = "0" + tmpNum;
+        }
+
+        Long c  = Long.parseLong(block2Concatenated);
+        Long d  = ((Long.parseLong(block2Concatenated)/97)*97);
+        Long difference2 = c - d;
+        System.out.println("Difference 2: " + difference2 + " 1:" + c + " 2: " + d);
+
+
         if(String.valueOf(difference2).length() == 1) {
-            difference2 = Long.getLong("0" + String.valueOf(difference2));
+            String difference2Text = String.valueOf(difference2);
+            String concatenate2 = "0" + difference2Text;
+            difference2 = Long.getLong(concatenate2);
         }
 
-        String block3Concatenated = String.valueOf(difference2) + String.valueOf(block3);
 
-        Long difference3 = Long.getLong(block3Concatenated) - ((Long.getLong(block3Concatenated)/97)*97);
+        a = String.valueOf(difference2);
+        if(a == null){
+            System.out.println("a ist null");
+            a = "0";
+        }
+        b = String.valueOf(block3);
+        String block3Concatenated = a + b;
+        System.out.println("Block 3 Concatenated: " + block3Concatenated + " 1: " + a + " 2: " + b);
+
+        if(block3Concatenated.startsWith("null")){
+            String tmpNum = block3Concatenated.substring(4);
+            block3Concatenated = "0" + tmpNum;
+        }
+
+        c = Long.parseLong(block3Concatenated);
+        d = ((Long.parseLong(block3Concatenated)/97)*97);
+        Long difference3 = c - d;
+        System.out.println("Difference 3: " + difference3 + " 1:" + c + " 2: " + d);
+
+
+
+
         if(String.valueOf(difference3).length() == 1) {
-            difference3 = Long.getLong("0" + String.valueOf(difference3));
+            String difference3Text = String.valueOf(difference3);
+            String concatenate3 = "0" + difference3Text;
+            difference3 = Long.getLong(concatenate3);
         }
 
-        String block4Concatenated = String.valueOf(difference3) + String.valueOf(block4);
 
-        Long difference4 = Long.getLong(block4Concatenated) - ((Long.getLong(block4Concatenated)/97)*97);
+        a = String.valueOf(difference3);
+        if(a == null){
+            System.out.println("a ist null");
+            a = "0";
+        }
+        b = String.valueOf(block4);
+        String block4Concatenated = a + b;
+        System.out.println("Diff4Concatenated: " + block4Concatenated + " 1: " + a + " 2: " + b);
+
+
+        if(block4Concatenated.startsWith("null")){
+            String tmpNum = block4Concatenated.substring(4);
+            block4Concatenated = "0" + tmpNum;
+        }
+
+        c = Long.parseLong(block4Concatenated);
+        d = ((Long.parseLong(block4Concatenated)/97)*97);
+        Long difference4 = c - d;
+        System.out.println("Difference 4: " + difference4 + " 1:" + c + " 2: " + d);
+
         if(String.valueOf(difference4).length() == 1) {
-            difference4 = Long.getLong("0" + String.valueOf(difference4));
+            String difference4Text = String.valueOf(difference4);
+            String concatenate4 = "0" + difference4Text;
+            difference4 = Long.getLong(concatenate4);
+        }
+
+        if(difference4 == null || difference4 == 0L){
+            return 98;
         }
 
         // Return checksum.
@@ -130,8 +203,7 @@ public class Account extends GeneratedIdEntity {
 
     @Override
     public String toString() {
-        return "Customer: " +
-                this.customer.toString() +
+        return
                 "iban: " +
                 this.iban +
                 "bic: " +
@@ -174,11 +246,5 @@ public class Account extends GeneratedIdEntity {
         this.credit = credit;
     }
 
-    public Customer getCustomer() {
-        return customer;
-    }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
 }

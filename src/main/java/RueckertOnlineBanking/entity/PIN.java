@@ -15,18 +15,24 @@ public class PIN extends GeneratedIdEntity {
 
     public PIN() {
         super.id = getId();
-        this.pinNumber = 5;
+        this.pinNumber = this.generatePin();
         //this.pinNumber = this.generatePin();
+    }
+
+    public PIN(int pinNumber) {
+        super.id = getId();
+        this.pinNumber = pinNumber;
     }
 
     private int generatePin() {
         // Generate a PIN number that consists of 6 digits.
         String actualPin = "";
         for(int i = 0; i < 6; i++) {
-            int digit =  ThreadLocalRandom.current().nextInt(0, 10);
+            // Generate numbers between 1 and 10. The 0 is excluded so that no leading 0s can appear.
+            int digit =  ThreadLocalRandom.current().nextInt(1, 10);
             actualPin = actualPin + String.valueOf(digit);
         }
-        return Integer.getInteger(actualPin);
+        return Integer.parseInt(actualPin);
     }
 
     @Override

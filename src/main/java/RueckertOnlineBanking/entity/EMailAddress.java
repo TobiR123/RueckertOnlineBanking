@@ -4,12 +4,11 @@ import RueckertOnlineBanking.entity.util.GeneratedIdEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import java.util.Objects;
 
 @Entity
 public class EMailAddress extends GeneratedIdEntity {
-
-
 
     private String mailAddress;
 
@@ -45,6 +44,12 @@ public class EMailAddress extends GeneratedIdEntity {
         } else {
             return this.id.hashCode();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "mailAddress: " +
+                this.mailAddress;
     }
 
     public String getMailAddress() {
