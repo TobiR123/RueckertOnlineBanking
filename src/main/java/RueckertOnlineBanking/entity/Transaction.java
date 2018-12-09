@@ -23,7 +23,6 @@ public class Transaction extends GeneratedIdEntity {
     private TAN tan;
 
     public Transaction() {
-
         super.id = getId();
     }
 
@@ -36,9 +35,7 @@ public class Transaction extends GeneratedIdEntity {
         this.tan = tan;
         this.timestamp = new Date();
 
-        // TODO: PUT THIS METHOD INTO SERVICES CLASS!
         checkLiquidityOfSender();
-
     }
 
     private boolean checkLiquidityOfSender() {

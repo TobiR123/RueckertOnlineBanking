@@ -1,7 +1,4 @@
 package RueckertOnlineBanking.entity;
-
-import java.util.concurrent.ThreadLocalRandom;
-
 import RueckertOnlineBanking.entity.util.GeneratedIdEntity;
 
 import javax.persistence.Entity;
@@ -244,6 +241,22 @@ public class Account extends GeneratedIdEntity {
 
     public void setCredit(double credit) {
         this.credit = credit;
+    }
+
+    public int getBankCode() {
+        return bankCode;
+    }
+
+    public void setBankCode(int bankCode) {
+        this.bankCode = bankCode;
+    }
+
+    public long getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(long accountNumber) {
+        this.accountNumber = accountNumber;
     }
 
 

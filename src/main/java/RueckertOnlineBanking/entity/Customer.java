@@ -3,6 +3,8 @@ package RueckertOnlineBanking.entity;
 import RueckertOnlineBanking.entity.util.GeneratedIdEntity;
 
 import javax.persistence.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +18,7 @@ public class Customer extends GeneratedIdEntity {
     @OneToMany(cascade= CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<EMailAddress> eMailAddresses;
     private int phoneNumber;
-    private String dateOfBirth;
+    private Date dateOfBirth;
     @OneToOne
     private Address address;
     @OneToOne
@@ -35,7 +37,7 @@ public class Customer extends GeneratedIdEntity {
         this.tanNumbers = new ArrayList<>();
     }
 
-    public Customer(String firstname, String lastname, EMailAddress emailAddress, int phoneNumber, String dateOfBirth, Address address){
+    public Customer(String firstname, String lastname, EMailAddress emailAddress, int phoneNumber, Date dateOfBirth, Address address){
         super.id = getId();
         this.firstname = firstname;
         this.lastname = lastname;
@@ -47,19 +49,6 @@ public class Customer extends GeneratedIdEntity {
         this.accounts = new ArrayList<>();
 
         this.tanNumbers = new ArrayList<>();
-        //this.fillTanNumbersList();
-        //this.sendTanNumbersListToEmail();
-    }
-
-    private void fillTanNumbersList() {
-        // Method to fill list of tans with 20 generated numbers.
-        for(int i = 0; i < 20; i++) {
-            this.tanNumbers.add(new TAN());
-        }
-    }
-
-    private void sendTanNumbersListToEmail() {
-        // TODO:
     }
 
     @Override
@@ -162,13 +151,16 @@ public class Customer extends GeneratedIdEntity {
 
         this.phoneNumber = phoneNumber;
     }
-    public String getDateOfBirth() {
+    public Date getDateOfBirth() {
 
         return this.dateOfBirth;
     }
-    public void setDateOfBirth(String dateOfBirth) {
+    public void setDateOfBirth(Date dateOfBirth) {
 
         this.dateOfBirth = dateOfBirth;
+    }
+    public void setDateOfBirth(String dateOfBirth) throws ParseException {
+        this.dateOfBirth = new SimpleDateFormat("yyyy-MM-dd").parse(dateOfBirth);
     }
     public Address getAddress() {
 
@@ -189,6 +181,13 @@ public class Customer extends GeneratedIdEntity {
     public List<TAN> getTanNumbers() {
 
         return this.tanNumbers;
+    }
+    public String getTanNumbersAsString() {
+        String result = "";
+        for(int i = 0; i < this.tanNumbers.size(); i++) {
+            result += " TAN" + i + ":" + String.valueOf(this.tanNumbers.get(i).getTanNumber());
+        }
+        return result;
     }
     public void addTanNumber(TAN tanNumber) {
 

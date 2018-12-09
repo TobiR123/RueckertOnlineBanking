@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @WebServlet(urlPatterns = {"/IrgendEinServlet2"})
@@ -90,7 +92,12 @@ public class IrgendEinServlet extends HttpServlet {
             String firstname = req.getParameter("firstname");
             String lastname = req.getParameter("lastname");
             Integer phoneNumber = Integer.parseInt(req.getParameter("phoneNumber"));
-            String dateOfBirth = req.getParameter("dateOfBirth");
+            Date dateOfBirth = null;
+            try {
+                dateOfBirth = new SimpleDateFormat("yyyy-MM-DD").parse(req.getParameter("dateOfBirth"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
             Customer customer = new Customer(firstname, lastname, eMailAddress, phoneNumber, dateOfBirth, address);
 

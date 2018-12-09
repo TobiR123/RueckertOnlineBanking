@@ -8,6 +8,7 @@ import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.Date;
 
 // Die meisten Modelle sind SessionScoped: Für die ganze Sitzung, vom login bis zum bestellen.
@@ -51,6 +52,8 @@ public class TestModel implements Serializable {
     private String lastname;
     private int phoneNumber;
     private String dateOfBirth;
+    // To show customer attributes after registration/login.
+    private Customer createdCustomer;
 
     // Login fields.
     private String eMailAddressLogin;
@@ -158,10 +161,17 @@ public class TestModel implements Serializable {
         this.pinLogin = pinLogin;
     }
 
+    public Customer getCreatedCustomer() {
+        return createdCustomer;
+    }
+
+    public void setCreatedCustomer(Customer createdCustomer) {
+        this.createdCustomer = createdCustomer;
+    }
 
 
-// PAGEFLOW: STRING ZURÜCKGEBEN; DER DIE FOLGESEITE ENTHÄLT!!!!
-    public String registerCustomer() {
+    // PAGEFLOW: STRING ZURÜCKGEBEN; DER DIE FOLGESEITE ENTHÄLT!!!!
+    public String registerCustomer() throws ParseException {
 
         // TODO: BRAUCHEN WIR DEN THIS.CUSTOMER USW: ÜBERHAUPT? EIGENTLICH MÜSSEN WIR DOCH NUR DIE ATTRIBUTE EINZELN ABSPEICHERN, UND DANN DEN NEUEN INSTANZEN HINZUFÜGEN?
         Customer newCustomer = new Customer();
@@ -177,7 +187,8 @@ public class TestModel implements Serializable {
 
         newCustomer = service.registerCustomer(newEmailAddress, newAddress, newCustomer);
         System.out.println(newCustomer.toString());
-        return "index.xhtml";
+        this.createdCustomer = newCustomer;
+        return "afterRegistrationView.xhtml";
     }
 
     public String loginCustomer() {
@@ -190,7 +201,7 @@ public class TestModel implements Serializable {
             System.out.println("Bei der Anmeldung lief etwas schief ... ");
         }
 
-        return "index.xhtml";
+        return "afterLoginView.xhtml";
     }
 
     // ##### AUXILIARY METHODS ##### //
@@ -211,7 +222,7 @@ public class TestModel implements Serializable {
         return newAddress;
     }
 
-    private Customer fillNewCustomerInstance(Customer newCustomer) {
+    private Customer fillNewCustomerInstance(Customer newCustomer) throws ParseException {
         newCustomer.setFirstname(this.firstname);
         newCustomer.setLastname(this.lastname);
         newCustomer.setPhoneNumber(this.phoneNumber);
