@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<!-- Ganz wichtig: Wenn Daten zum Server geschickt werden sollen, IMMER form hinzufügen!
+// Ganz wichtig: Bei neuem Facelet IMMER body hinzufügen! -->
+
+    <h:head>
+
+    </h:head>
+
+    <h:body>
+        <ui:composition template="WEB-INF/templates/basicTemplate.xhtml">
+            <ui:define name="content">
+                <f:view>
+                    <h:form>
+                        <h2>Login</h2>
+                        E-Mail: <h:inputText value="#{mainViewModel.eMailAddressLogin}"/><br />
+                        PIN: <h:inputText value="#{mainViewModel.pinLogin}"/><br />
+                        <h:commandButton value="Login" action="#{mainViewModel.loginCustomer()}"/>
+
+                        <h2>Noch kein Kunde? Dann aber schnell registrieren!</h2>
+                        Vorname: <h:inputText value="#{mainViewModel.firstname}"/><br />
+                        Nachname: <h:inputText value="#{mainViewModel.lastname}"/><br />
+                        E-Mail: <h:inputText value="#{mainViewModel.eMailAddress}"/><br />
+                        Telefonnummer: <h:inputText value="#{mainViewModel.phoneNumber}" /><br />
+                        Geburtsdatum (Format YYYY-MM-DD): <h:inputText value="#{mainViewModel.dateOfBirth}" /><br />
+                        Strasse: <h:inputText value="#{mainViewModel.street}" /><br />
+                        Hausnummer: <h:inputText value="#{mainViewModel.houseNumber}" /><br />
+                        Postleitzahl: <h:inputText value="#{mainViewModel.postcode}" /><br />
+                        Ort: <h:inputText value="#{mainViewModel.place}" /><br />
+                        Neuer Customer: <h:outputText value="#{mainViewModel.phoneNumber}" />
+                        <h:commandButton value="Registrieren" action="#{mainViewModel.registerCustomer()}"/>
+                    </h:form>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>

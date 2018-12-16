@@ -9,6 +9,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 @RequestScoped
@@ -143,6 +144,63 @@ public class CustomerService implements Serializable {
             return false;
         }
         return true;
+    }
+
+    @Transactional
+    public Customer updateCustomer(long customerId, String firstname, String lastname, long eMailAddressId, String eMailAddress, int phoneNumber, Date dateOfBirth, long addressId, String street, String houseNumber, int postalcode, String place, long pinId, int pinNumber) {
+        // Fetch all required datasets.
+        TypedQuery<Customer> customerQuery = entityManager.createQuery(
+                "SELECT c FROM  Customer AS c WHERE :customerId = c.id",
+                Customer.class
+        );
+
+        customerQuery.setParameter("customerId", customerId);
+        Customer customerToUpdate = customerQuery.getResultList().get(0);
+
+        TypedQuery<Address> addressQuery = entityManager.createQuery(
+                "SELECT a FROM  Address AS a WHERE :addressId = a.id",
+                Address.class
+        );
+        addressQuery.setParameter("addressId", addressId);
+        Address addressToUpdate = addressQuery.getResultList().get(0);
+
+        TypedQuery<PIN> pinQuery = entityManager.createQuery(
+                "SELECT p FROM  PIN AS p WHERE :pinId = p.id",
+                PIN.class
+        );
+        pinQuery.setParameter("pinId", pinId);
+        PIN pinToUpdate = pinQuery.getResultList().get(0);
+
+        TypedQuery<EMailAddress> emailAddressQuery = entityManager.createQuery(
+                "SELECT e FROM  EMailAddress AS e WHERE :emailAddressId = e.id",
+                EMailAddress.class
+        );
+        emailAddressQuery.setParameter("emailAddressId", eMailAddressId);
+        EMailAddress emailAddressToUpdate = emailAddressQuery.getResultList().get(0);
+
+        // Set updated values.
+        pinToUpdate.setPinNumber(pinNumber);
+        entityManager.persist(pinToUpdate);
+
+        addressToUpdate.setStreet(street);
+        addressToUpdate.setHouseNumber(houseNumber);
+        addressToUpdate.setPostcode(postalcode);
+        addressToUpdate.setPlace(place);
+        entityManager.persist(addressToUpdate);
+
+        emailAddressToUpdate.setMailAddress(eMailAddress);
+        entityManager.persist(emailAddressToUpdate);
+
+        customerToUpdate.setFirstname(firstname);
+        customerToUpdate.setLastname(lastname);
+        customerToUpdate.updateEmailAddressOnIndex(0, emailAddressToUpdate);
+        customerToUpdate.setPhoneNumber(phoneNumber);
+        customerToUpdate.setDateOfBirth(dateOfBirth);
+        customerToUpdate.setAddress(addressToUpdate);
+        customerToUpdate.setPinNumber(pinToUpdate);
+        entityManager.persist(customerToUpdate);
+
+        return customerToUpdate;
     }
 
     @Transactional

@@ -33,16 +33,12 @@ public class TransactionModel implements Serializable {
         this.transactionService = new TransactionService();
     }
 
-
-
-
-
     @Inject
     private CustomerService customerService;
     @Inject
     private TransactionService transactionService;
-
     // Transaction attributes.
+    private String senderIban;
     private String receiverIban;
     private String receiverBic;
     private double amount;
@@ -89,8 +85,30 @@ public class TransactionModel implements Serializable {
         this.tanNumber = tanNumber;
     }
 
-    public void executeTransaction() {
+    public String getSenderIban() {
+        return senderIban;
+    }
 
+    public void setSenderIban(String senderIban) {
+        this.senderIban = senderIban;
+    }
+
+    public String executeTransaction() {
+
+        Transaction transaction = new Transaction();
+        Account receiver = transactionService.getAccountByIban(this.receiverIban);
+        if(receiver == null){
+            return "ReceiverNotFound.xhtml";
+        }
+        return "afterLoginView.xhtml";
+    }
+
+    public String goBackToTransactionView() {
+        return "TransactionView.xhtml";
+    }
+
+    public String goBackToMainView() {
+        return "afterLoginView.xhtml";
     }
 
 }

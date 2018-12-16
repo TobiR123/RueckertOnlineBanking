@@ -9,27 +9,27 @@
 <!-- Ganz wichtig: Wenn Daten zum Server geschickt werden sollen, IMMER form hinzufügen!
 // Ganz wichtig: Bei neuem Facelet IMMER body hinzufügen! -->
 
-    <h:body>
-        <f:view>
-            <h:form>
-                <h2>Login</h2>
-                E-Mail: <h:inputText value="#{testModel.eMailAddressLogin}"/><br />
-                PIN: <h:inputText value="#{testModel.pinLogin}"/><br />
-                <h:commandButton value="Login" action="#{testModel.loginCustomer()}"/>
+    <!--<h:body>-->
+        <!--<f:view>-->
+            <!--<h:form>-->
+                <!--<h2>Login</h2>-->
+                <!--E-Mail: <h:inputText value="#{MainViewModel.eMailAddressLogin}"/><br />-->
+                <!--PIN: <h:inputText value="#{MainViewModel.pinLogin}"/><br />-->
+                <!--<h:commandButton value="Login" action="#{MainViewModel.loginCustomer()}"/>-->
 
-                <h2>Noch kein Kunde? Dann aber schnell registrieren!</h2>
-                Vorname: <h:inputText value="#{testModel.firstname}"/><br />
-                Nachname: <h:inputText value="#{testModel.lastname}"/><br />
-                E-Mail: <h:inputText value="#{testModel.eMailAddress}"/><br />
-                Telefonnummer: <h:inputText value="#{testModel.phoneNumber}" /><br />
-                Geburtsdatum (Format YYYY-MM-DD): <h:inputText value="#{testModel.dateOfBirth}" /><br />
-                Strasse: <h:inputText value="#{testModel.street}" /><br />
-                Hausnummer: <h:inputText value="#{testModel.houseNumber}" /><br />
-                Postleitzahl: <h:inputText value="#{testModel.postcode}" /><br />
-                Ort: <h:inputText value="#{testModel.place}" /><br />
-                Neuer Customer: <h:outputText value="#{testModel.phoneNumber}" />
-                <h:commandButton value="Registrieren" action="#{testModel.registerCustomer()}"/>
-            </h:form>
-        </f:view>
-    </h:body>
+                <!--<h2>Noch kein Kunde? Dann aber schnell registrieren!</h2>-->
+                <!--Vorname: <h:inputText value="#{MainViewModel.firstname}"/><br />-->
+                <!--Nachname: <h:inputText value="#{MainViewModel.lastname}"/><br />-->
+                <!--E-Mail: <h:inputText value="#{MainViewModel.eMailAddress}"/><br />-->
+                <!--Telefonnummer: <h:inputText value="#{MainViewModel.phoneNumber}" /><br />-->
+                <!--Geburtsdatum (Format YYYY-MM-DD): <h:inputText value="#{MainViewModel.dateOfBirth}" /><br />-->
+                <!--Strasse: <h:inputText value="#{MainViewModel.street}" /><br />-->
+                <!--Hausnummer: <h:inputText value="#{MainViewModel.houseNumber}" /><br />-->
+                <!--Postleitzahl: <h:inputText value="#{MainViewModel.postcode}" /><br />-->
+                <!--Ort: <h:inputText value="#{MainViewModel.place}" /><br />-->
+                <!--Neuer Customer: <h:outputText value="#{MainViewModel.phoneNumber}" />-->
+                <!--<h:commandButton value="Registrieren" action="#{MainViewModel.registerCustomer()}"/>-->
+            <!--</h:form>-->
+        <!--</f:view>-->
+    <!--</h:body>-->
 </html>

@@ -16,6 +16,7 @@ public class Customer extends GeneratedIdEntity {
     private String firstname;
     private String lastname;
     @OneToMany(cascade= CascadeType.PERSIST, fetch = FetchType.EAGER)
+    // TODO: ALLOW ONLY ONE EMAIL ADDRESS HERE!!
     private List<EMailAddress> eMailAddresses;
     private int phoneNumber;
     private Date dateOfBirth;
@@ -140,12 +141,19 @@ public class Customer extends GeneratedIdEntity {
 
         this.eMailAddresses.remove(eMailAddress);
     }
+    public void updateEmailAddressOnIndex(int index, EMailAddress newEmailAddress){
+        this.eMailAddresses.set(index, newEmailAddress);
+    }
     public List<EMailAddress> geteMailAddresses() {
         return this.eMailAddresses;
     }
     public int getPhoneNumber() {
 
         return this.phoneNumber;
+    }
+
+    public EMailAddress getEmailAddress() {
+        return this.eMailAddresses.get(0);
     }
     public void setPhoneNumber(int phoneNumber) {
 
