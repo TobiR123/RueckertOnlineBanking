@@ -1,39 +1,39 @@
 package RueckertOnlineBanking.entity;
 
 import RueckertOnlineBanking.entity.util.GeneratedIdEntity;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 public class Customer extends GeneratedIdEntity {
 
     private String firstname;
     private String lastname;
-    @OneToMany(cascade= CascadeType.PERSIST, fetch = FetchType.EAGER)
-    // TODO: ALLOW ONLY ONE EMAIL ADDRESS HERE!!
-    private List<EMailAddress> eMailAddresses;
+    //@OneToMany(cascade= CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToOne
+    private EMailAddress eMailAddress;
     private int phoneNumber;
     private Date dateOfBirth;
     @OneToOne
     private Address address;
     @OneToOne
     private PIN pinNumber;
-    @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade= CascadeType.PERSIST)
     private List<TAN> tanNumbers;
-    @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade= CascadeType.PERSIST)
     private List<Account> accounts;
 
 
 
     public Customer(){
         super.id = getId();
-        this.eMailAddresses = new ArrayList<>();
         this.accounts = new ArrayList<>();
         this.tanNumbers = new ArrayList<>();
     }
@@ -42,8 +42,7 @@ public class Customer extends GeneratedIdEntity {
         super.id = getId();
         this.firstname = firstname;
         this.lastname = lastname;
-        this.eMailAddresses = new ArrayList<>();
-        this.eMailAddresses.add(emailAddress);
+        this.eMailAddress = emailAddress;
         this.phoneNumber = phoneNumber;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
@@ -60,7 +59,7 @@ public class Customer extends GeneratedIdEntity {
                 " Lastname: " +
                 this.lastname +
                 " E-Mail Addresses: " +
-                this.printEmailAddresses() +
+                this.eMailAddress +
                 " Phone Number: " +
                 this.phoneNumber +
                 " Date of Birth: " +
@@ -99,14 +98,6 @@ public class Customer extends GeneratedIdEntity {
         }
     }
 
-    private String printEmailAddresses() {
-        String result = "";
-        for(int i = 0; i < this.eMailAddresses.size(); i++) {
-            result += eMailAddresses.get(i).toString();
-        }
-        return result;
-    }
-
     ///// GETTERS AND SETTERS /////
     public Long getId() {
         return super.getId();
@@ -128,32 +119,15 @@ public class Customer extends GeneratedIdEntity {
 
         this.lastname = lastname;
     }
-    public List<EMailAddress> getEmailAddresses() {
-
-        return this.eMailAddresses;
-    }
-    public void addEmailAddress(EMailAddress eMailAddress)
-    {
-
-        this.eMailAddresses.add(eMailAddress);
-    }
-    public void removeEmailAddress(EMailAddress eMailAddress) {
-
-        this.eMailAddresses.remove(eMailAddress);
-    }
-    public void updateEmailAddressOnIndex(int index, EMailAddress newEmailAddress){
-        this.eMailAddresses.set(index, newEmailAddress);
-    }
-    public List<EMailAddress> geteMailAddresses() {
-        return this.eMailAddresses;
-    }
     public int getPhoneNumber() {
 
         return this.phoneNumber;
     }
-
-    public EMailAddress getEmailAddress() {
-        return this.eMailAddresses.get(0);
+    public EMailAddress geteMailAddress(){
+        return this.eMailAddress;
+    }
+    public void seteMailAddress(EMailAddress eMailAddress) {
+        this.eMailAddress = eMailAddress;
     }
     public void setPhoneNumber(int phoneNumber) {
 
@@ -213,6 +187,10 @@ public class Customer extends GeneratedIdEntity {
 
         this.accounts.add(account);
     }
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
+    }
+
     public void removeAccount(Account account) {
 
         this.accounts.remove(account);

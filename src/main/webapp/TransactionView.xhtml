@@ -13,8 +13,8 @@
         <f:view>
             <h:form>
                 <h2>Transaktion durchführen:</h2>
-                Sender-IBAN: <h:outputText value="#{mainViewModel.createdCustomer.accounts.get(0).iban}"/><br />
-                Sender-BIC: <h:outputText value="#{mainViewModel.createdCustomer.accounts.get(0).bic}"/><br /><br />
+                Sender-IBAN: <h:outputText value="#{customerModel.createdCustomer.accounts.get(0).iban}"/><br />
+                Sender-BIC: <h:outputText value="#{customerModel.createdCustomer.accounts.get(0).bic}"/><br /><br />
 
                 Empfänger-IBAN: <h:inputText value="#{transactionModel.receiverIban}"/><br />
                 Empfänger-BIC: <h:inputText value="#{transactionModel.receiverBic}"/><br /><br />

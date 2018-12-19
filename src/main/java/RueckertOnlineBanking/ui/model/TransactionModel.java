@@ -100,7 +100,7 @@ public class TransactionModel implements Serializable {
         if(receiver == null){
             return "ReceiverNotFound.xhtml";
         }
-        return "afterLoginView.xhtml";
+        return "a.xhtml";
     }
 
     public String goBackToTransactionView() {
@@ -108,7 +108,7 @@ public class TransactionModel implements Serializable {
     }
 
     public String goBackToMainView() {
-        return "afterLoginView.xhtml";
+        return "a.xhtml";
     }
 
 }

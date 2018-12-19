@@ -16,38 +16,41 @@
     <ui:composition template="../WEB-INF/templates/basicTemplate.xhtml">
         <ui:define name="content">
             <f:view>
-                <h2>Herzlichen Glückwunsch #{mainViewModel.firstname}, du hast dich erfolgreich registriert!</h2>
+                <h2>Hallo #{customerModel.lastRegistered.firstname}!</h2>
                 <h:form>
-                    <h:outputText value="Deine PIN ist #{mainViewModel.createdCustomer.pinNumber.pinNumber}."/><br/>
+                    <h:outputText value="Deine PIN ist #{customerModel.lastRegistered.pinNumber.pinNumber}."/><br/>
                     <h:outputText value="Mit dieser kannst du dich ab sofort einloggen." /><br/>
                     <h:outputText value="Du kannst deine PIN auch unter dem Menüpunkt 'Profil bearbeiten' ändern." /><br/><br/>
                     <h3>Deine gespeicherten Daten:</h3>
                     <!-- Hier Profil anzeigen. -->
-                    Vorname: <h:outputText value="#{mainViewModel.firstname}"/><br />
-                    Nachname: <h:outputText value="#{mainViewModel.lastname}"/><br />
-                    E-Mail: <h:outputText value="#{mainViewModel.eMailAddress}"/><br />
-                    Telefonnummer: <h:outputText value="#{mainViewModel.phoneNumber}" /><br />
-                    Geburtsdatum (Format YYYY-MM-DD): <h:outputText value="#{mainViewModel.dateOfBirth}" /><br />
-                    Strasse: <h:outputText value="#{mainViewModel.street}" /><br />
-                    Hausnummer: <h:outputText value="#{mainViewModel.houseNumber}" /><br />
-                    Postleitzahl: <h:outputText value="#{mainViewModel.postcode}" /><br />
-                    Ort: <h:outputText value="#{mainViewModel.place}" /><br /><br />
+                    Vorname: <h:outputText value="#{customerModel.lastRegistered.firstname}"/><br />
+                    Nachname: <h:outputText value="#{customerModel.lastRegistered.lastname}"/><br />
+                    E-Mail: <h:outputText value="#{customerModel.lastRegistered.eMailAddress.mailAddress}"/><br />
+                    Telefonnummer: <h:outputText value="#{customerModel.lastRegistered.phoneNumber}" /><br />
+                    Geburtsdatum (Format YYYY-MM-DD): <h:outputText value="#{customerModel.lastRegistered.dateOfBirth}" /><br />
+                    Strasse: <h:outputText value="#{customerModel.lastRegistered.address.street}" /><br />
+                    Hausnummer: <h:outputText value="#{customerModel.lastRegistered.address.houseNumber}" /><br />
+                    Postleitzahl: <h:outputText value="#{customerModel.lastRegistered.address.postcode}" /><br />
+                    Ort: <h:outputText value="#{customerModel.lastRegistered.address.place}" /><br /><br />
 
-                    <h:commandButton value="Profil bearbeiten" action="#{mainViewModel.showEditCustomerPage}" />
-                    <h:commandButton value="Profil löschen" action="#{userMainViewModel.editUserProfile}" />
+                    <h:commandButton value="Profil bearbeiten" action="#{customerModel.showEditCustomerPage}" />
+                    <h:commandButton value="Profil löschen" action="#{customerModel.editUserProfile}" />
 
                     <h3>Deine existierenden Bankkonten:</h3>
-                    Kontonummer: <h:outputText value="#{mainViewModel.createdCustomer.accounts.get(0).accountNumber}"/><br />
-                    Bankleitzahl: <h:outputText value="#{mainViewModel.createdCustomer.accounts.get(0).bankCode}"/><br />
-                    IBAN: <h:outputText value="#{mainViewModel.createdCustomer.accounts.get(0).iban}"/><br />
-                    BIC: <h:outputText value="#{mainViewModel.createdCustomer.accounts.get(0).bic}"/><br /><br />
+                    Kontonummer: <h:outputText value="#{customerModel.lastRegistered.accounts.get(0).accountNumber}"/><br />
+                    Bankleitzahl: <h:outputText value="#{customerModel.lastRegistered.accounts.get(0).bankCode}"/><br />
+                    IBAN: <h:outputText value="#{customerModel.lastRegistered.accounts.get(0).iban}"/><br />
+                    BIC: <h:outputText value="#{customerModel.lastRegistered.accounts.get(0).bic}"/><br />
+                    Guthaben: <h:outputText value="#{customerModel.lastRegistered.accounts.get(0).credit}"/><br /><br />
 
-                    <h:commandButton value="Neues Konto erstellen" action="#{userMainViewModel.editUserProfile}" />
-                    <h:commandButton value="Bestehende Konten anzeigen" action="#{userMainViewModel.editUserProfile}" />
+                    <h:commandButton value="Neues Konto erstellen" action="#{customerModel.editUserProfile}" />
+                    <h:commandButton value="Bestehende Konten anzeigen" action="#{customerModel.editUserProfile}" />
 
                     <h3>Deine durchgeführten Transaktionen:</h3>
 
-                    <h:commandButton value="Neue Transaktion durchführen" action="#{userMainViewModel.goToTransactionScreen}" />
+                    <h:commandButton value="Neue Transaktion durchführen" action="#{customerModel.goToTransactionScreen}" />
+
+                    <h:commandButton value="Ausloggen" action="#{customerModel.logout}" />
                 </h:form>
             </f:view>
         </ui:define>

@@ -88,7 +88,6 @@ public class Account extends GeneratedIdEntity {
         }
         String b = String.valueOf(block2);
         String block2Concatenated = a + b;
-        System.out.println("Block 2 Concatenated: " + block2Concatenated + " 1: " + a + " 2: " + b);
 
 
         if(block2Concatenated.startsWith("null")){
@@ -99,8 +98,6 @@ public class Account extends GeneratedIdEntity {
         Long c  = Long.parseLong(block2Concatenated);
         Long d  = ((Long.parseLong(block2Concatenated)/97)*97);
         Long difference2 = c - d;
-        System.out.println("Difference 2: " + difference2 + " 1:" + c + " 2: " + d);
-
 
         if(String.valueOf(difference2).length() == 1) {
             String difference2Text = String.valueOf(difference2);
@@ -116,7 +113,6 @@ public class Account extends GeneratedIdEntity {
         }
         b = String.valueOf(block3);
         String block3Concatenated = a + b;
-        System.out.println("Block 3 Concatenated: " + block3Concatenated + " 1: " + a + " 2: " + b);
 
         if(block3Concatenated.startsWith("null")){
             String tmpNum = block3Concatenated.substring(4);
@@ -156,7 +152,6 @@ public class Account extends GeneratedIdEntity {
         c = Long.parseLong(block4Concatenated);
         d = ((Long.parseLong(block4Concatenated)/97)*97);
         Long difference4 = c - d;
-        System.out.println("Difference 4: " + difference4 + " 1:" + c + " 2: " + d);
 
         if(String.valueOf(difference4).length() == 1) {
             String difference4Text = String.valueOf(difference4);

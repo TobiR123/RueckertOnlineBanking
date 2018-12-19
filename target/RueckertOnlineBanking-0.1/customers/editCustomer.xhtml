@@ -19,17 +19,17 @@
             <f:view>
                 <h2>Hier kannst du deine gespeicherten Daten bearbeiten:</h2>
                 <h:form>
-                    Vorname: <h:inputText value="#{mainViewModel.firstname}"/><br />
-                    Nachname: <h:inputText value="#{mainViewModel.lastname}"/><br />
-                    E-Mail: <h:inputText value="#{mainViewModel.eMailAddress}"/><br />
-                    Telefonnummer: <h:inputText value="#{mainViewModel.phoneNumber}" /><br />
-                    Geburtsdatum (Format YYYY-MM-DD): <h:inputText value="#{mainViewModel.dateOfBirth}" /><br />
-                    Strasse: <h:inputText value="#{mainViewModel.street}" /><br />
-                    Hausnummer: <h:inputText value="#{mainViewModel.houseNumber}" /><br />
-                    Postleitzahl: <h:inputText value="#{mainViewModel.postcode}" /><br />
-                    Ort: <h:inputText value="#{mainViewModel.place}" /><br />
-                    PIN: <h:inputText value="#{mainViewModel.pinLogin}"/><br />
-                    <h:commandButton value="Speichern" action="#{mainViewModel.updateCustomer}"/>
+                    Vorname: <h:inputText value="#{customerModel.lastRegistered.firstname}"/><br />
+                    Nachname: <h:inputText value="#{customerModel.lastRegistered.lastname}"/><br />
+                    E-Mail: <h:inputText value="#{customerModel.lastRegistered.eMailAddress.mailAddress}"/><br />
+                    Telefonnummer: <h:inputText value="#{customerModel.lastRegistered.phoneNumber}" /><br />
+                    Geburtsdatum (Format YYYY-MM-DD): <h:inputText value="#{customerModel.lastRegistered.dateOfBirth}" converter="dateOfBirthConverter"/><br />
+                    Strasse: <h:inputText value="#{customerModel.lastRegistered.address.street}" /><br />
+                    Hausnummer: <h:inputText value="#{customerModel.lastRegistered.address.houseNumber}" /><br />
+                    Postleitzahl: <h:inputText value="#{customerModel.lastRegistered.address.postcode}" /><br />
+                    Ort: <h:inputText value="#{customerModel.lastRegistered.address.place}" /><br />
+                    PIN: <h:inputText value="#{customerModel.lastRegistered.pinNumber.pinNumber}"/><br />
+                    <h:commandButton value="Speichern" action="#{customerModel.updateCustomer}"/>
                 </h:form>
             </f:view>
         </ui:define>
