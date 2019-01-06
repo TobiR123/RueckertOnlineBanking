@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<!-- Ganz wichtig: Wenn Daten zum Server geschickt werden sollen, IMMER form hinzufügen!
+// Ganz wichtig: Bei neuem Facelet IMMER body hinzufügen! -->
+
+<h:body>
+    <ui:composition template="../WEB-INF/templates/basicTemplate.xhtml">
+        <ui:define name="left">
+            <f:view>
+                <h:panelGrid rendered="#{customerModel.recentlyRegistered}" columns="1">
+                    <h:outputText value="Hier siehst du deine TAN-Nummern, die du  zur Bestätigung von Transaktionen benötigst." />
+                    <h:outputText value="VORSICHT: Schreib dir diese TANs am Besten irgendwo auf! Diese werden dir bei allen weiteren Logins NCIHT wieder angezeigt!!!" />
+                    <h:dataTable var="tan" value="#{customerModel.lastRegistered.tanNumbers}">
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="TAN" />
+                            </f:facet>
+                            <h:outputText value="#{tan.tanNumber}" />
+                        </h:column>
+                    </h:dataTable>
+                </h:panelGrid>
+                <h:panelGrid rendered="#{customerModel.recentlyLoggedIn}" columns="1">
+                    <h:outputText value="Hier standen bei der Registrierung deine TAN-Nummern. Ich hoffe, du hast dir diese aufgeschrieben ... " />
+                </h:panelGrid>
+            </f:view>
+        </ui:define>
+        <ui:define name="content">
+            <f:view>
+                <h:form>
+                    <h2>Übersicht deiner eingegebenen Daten:</h2>
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Sender-IBAN:" />
+                        <h:outputText value="#{transactionModel.selectedSenderAccount.iban}" />
+
+                        <h:outputText value="Sender-BIC:" />
+                        <h:outputText value="#{transactionModel.selectedSenderAccount.bic}" />
+
+                        <h:outputText value="Empfänger-IBAN:" />
+                        <h:outputText value="#{transactionModel.receiverIban}"/>
+
+                        <h:outputText value="Empfänger-BIC:" />
+                        <h:outputText value="#{transactionModel.receiverBic}"/>
+
+                        <h:outputText value="Betrag:" />
+                        <h:outputText value="#{transactionModel.amount}"/>
+
+                        <h:outputText value="Überweisungszweck:" />
+                        <h:outputText value="#{transactionModel.description}"/>
+
+                    </h:panelGrid>
+                    <h2>Gib jetzt zur Bestätigung noch eine deiner verbleibenden TAN-Nummern ein (Diese Nummer wird anschließend ungültig):</h2>
+
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Bestätigungs-TAN:" />
+                        <h:inputText value="#{transactionModel.tanNumber.tanNumber}"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1">
+                        <h:outputText rendered="#{transactionModel.invalidTan}" value="FEHLER: Diese TAN ist ungültig! Entweder hast du diese Nummer bereits verwendet oder sie wurde dir nicht zugewiesen!" />
+                        <h:outputText rendered="#{transactionModel.receiverAccountNotFound}" value="VORSICHT: Das Konto des Empfängers ist nicht bei dieser Bank registriert. Wir können also nicht garantieren, dass deine Angaben korrekt sind." />
+                        <h:outputText rendered="#{transactionModel.senderNeedsCreditForTransaction}" value="VORSICHT: Dein Konto weist keine ausreichende Deckung auf. Du gelangst mit dieser Transaktion ins Dispo (max. 100,00€ möglich)!!!" />
+                        <h:outputText rendered="#{transactionModel.senderAccountIsOutOfCreditRange}" value="SORRY! Du kannst dein Konto nur bis zu 100€ überziehen!" />
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <h:commandButton value="Zurück" action="#{customerModel.goToTransactionScreen}"/>
+                        <h:commandButton rendered="#{transactionModel.transactionValid}" value="Transaktion durchführen" action="#{transactionModel.executeTransaction}"/>
+                    </h:panelGrid>
+                </h:form>
+            </f:view>
+        </ui:define>
+    </ui:composition>
+</h:body>
+</html>
