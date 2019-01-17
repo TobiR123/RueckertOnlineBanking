@@ -3,6 +3,7 @@ package RueckertOnlineBanking.service;
 import RueckertOnlineBanking.entity.*;
 import RueckertOnlineBanking.entity.customExceptions.customerTooYoungException;
 import RueckertOnlineBanking.entity.customExceptions.emailAddressAlreadyInUseException;
+import RueckertOnlineBanking.entity.customExceptions.pinTooShortException;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -17,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -25,7 +27,8 @@ import java.util.concurrent.TimeUnit;
 @RequestScoped
 public class CustomerService implements Serializable {
 
-    @PersistenceContext(unitName = "examplePU")
+    @PersistenceContext(unitName = "RueckertPU")
+    //@PersistenceContext(unitName = "examplePU")
     private EntityManager entityManager;
 
     @Inject
@@ -155,11 +158,20 @@ public class CustomerService implements Serializable {
     }
 
     @Transactional
-    public Customer updateCustomer(Customer customer) throws emailAddressAlreadyInUseException {
+    public Customer updateCustomer(Customer customer) throws emailAddressAlreadyInUseException, pinTooShortException {
         Customer original = this.getCustomerById(customer.getId());
 
-        if(this.checkIfEmailAddressAlreadyExists(customer.geteMailAddress())){
-            throw new emailAddressAlreadyInUseException(customer.geteMailAddress().getMailAddress());
+        // Check if e-mail address is the same as before. If not, check if the new one is available.
+        if(!original.geteMailAddress().getMailAddress().equals(customer.geteMailAddress().getMailAddress())){
+            if(this.checkIfEmailAddressAlreadyExists(customer.geteMailAddress())){
+                throw new emailAddressAlreadyInUseException(customer.geteMailAddress().getMailAddress());
+            }
+        }
+
+        int newPin = customer.getPinNumber().getPinNumber();
+        int length = String.valueOf(newPin).length();
+        if(length < 6){
+            throw new pinTooShortException(newPin);
         }
 
         original.setFirstname(customer.getFirstname());
@@ -262,4 +274,6 @@ public class CustomerService implements Serializable {
         );
         return query.getResultList();
     }
+
+
 }

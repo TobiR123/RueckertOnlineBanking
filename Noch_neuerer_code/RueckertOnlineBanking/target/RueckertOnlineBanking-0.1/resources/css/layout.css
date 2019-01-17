@@ -1,0 +1,72 @@
+
+#top {
+    position: relative;
+    background-color: gray;
+    /*background-image: url("#{request.contextPath}/resources/images/oth-regensburg-logo-bildmarke.png");*/
+    background-image: url("#{request.contextPath}/resources/images/bank_icon_transparent_white_.png");
+    background-repeat: no-repeat;
+    color: white;
+    height: 81px;
+    padding: 5px 5px 15px 180px;
+    margin: 0px 0px 10px 0px;
+}
+
+#bottom {
+    position: relative;
+    background-color: #c2dfef;
+    padding: 5px;
+    /*margin: 10px 0px 0px 0px;*/
+    clear: both;
+}
+
+#left {
+    float: left;
+    background-color: #ece3a5;
+    padding: 5px;
+    width: 150px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+#content {
+    margin-bottom: 10px;
+}
+
+#right {
+    float: right;
+    background-color: #ece3a5;
+    padding: 5px;
+    width: 150px;
+}
+
+.center_content {
+    position: relative;
+    background-color: #dddddd;
+    padding: 5px;
+}
+
+.left_content {
+    background-color: #dddddd;
+    padding: 5px;
+    margin-left: 170px;
+}
+
+.right_content {
+    background-color: #dddddd;
+    padding: 5px;
+    margin: 0px 170px 0px 170px;
+}
+
+#top a:link, #top a:visited {
+    color: white;
+    font-weight : bold;
+    text-decoration: none;
+}
+
+#top a:link:hover, #top a:visited:hover  {
+    color: cornflowerblue;
+    font-weight : bold;
+    text-decoration : underline;
+}
+
+

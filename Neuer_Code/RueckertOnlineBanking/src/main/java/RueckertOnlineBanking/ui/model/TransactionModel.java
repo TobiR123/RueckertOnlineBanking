@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 @SessionScoped
 public class TransactionModel implements Serializable {
 
+    // ##### PROPERTIES ##### //
     @Inject
     private CustomerService customerService;
     @Inject
@@ -33,9 +34,9 @@ public class TransactionModel implements Serializable {
     private TransactionService transactionService;
     @Inject
     private CustomerModel customerModel;
-//    @Inject
-//    private LoggerFactory loggerFactory;
-//    private Logger logger;
+    @Inject
+    private LoggerFactory loggerFactory;
+    private Logger logger;
     @Inject
     private SenderAccountConverter converterSelectedSenderAccount;
     private Account selectedSenderAccount;
@@ -46,7 +47,8 @@ public class TransactionModel implements Serializable {
     private double amount;
     private String description;
     private TAN tanNumber;
-    private List<Transaction> successfulTransactions;
+
+    private List<Transaction> customerTransactions;
 
     // This flag shows, if the receiver account is registered at this bank or not.
     private boolean receiverAccountNotFound = false;
@@ -64,18 +66,20 @@ public class TransactionModel implements Serializable {
         this.transactionService = new TransactionService();
         this.tanNumber = new TAN();
         this.tanNumber.setTanNumber(0);
-        this.successfulTransactions = new ArrayList<>();
-//        this.loggerFactory = new LoggerFactory();
-//        this.logger = this.loggerFactory.create();
+        this.loggerFactory = new LoggerFactory();
+        this.logger = this.loggerFactory.create();
+        this.customerTransactions = new ArrayList<>();
     }
 
     // ##### GETTER AND SETTER ##### //
 
-    public List<Transaction> getSuccessfulTransactions() {
-        return successfulTransactions;
+    public List<Transaction> getCustomerTransactions() {
+        return customerTransactions;
     }
 
-    public void setSuccessfulTransactions(List<Transaction> successfulTransactions) { this.successfulTransactions = successfulTransactions; }
+    public void setCustomerTransactions(List<Transaction> customerTransactions) {
+        this.customerTransactions = customerTransactions;
+    }
 
     public boolean isInvalidTan() {
         return invalidTan;
@@ -163,23 +167,22 @@ public class TransactionModel implements Serializable {
         this.tanNumber = tanNumber;
     }
 
+
+    // ##### METHODS ##### //
     public String executeTransaction() {
         Customer senderCustomer = this.customerModel.getLastRegistered();
-        Account receiverAccount = accountService.getAccountByIban(this.receiverIban);
         try {
-            Transaction successfulTransaction = transactionService.executeTransaction(this.selectedSenderAccount, senderCustomer, receiverAccount, this.receiverIban, this.receiverBic, this.amount, this.description, this.tanNumber);
-            this.successfulTransactions.add(successfulTransaction);
+            Transaction successfulTransaction = transactionService.executeTransaction(this.selectedSenderAccount, senderCustomer, this.receiverIban, this.receiverBic, this.amount, this.description, this.tanNumber);
+
+            this.customerTransactions = this.transactionService.getCustomerTransactions(senderCustomer);
+
             this.customerModel.setLastRegistered(this.customerService.getCustomerById(senderCustomer.getId()));
-            this.receiverIban = "";
-            this.receiverBic = "";
-            this.amount = 0.0;
-            this.description = "";
         } catch (invalidTanException e) {
-//            this.logger.log(Level.SEVERE, "The given TAN number is invalid.");
+            this.logger.log(Level.SEVERE, "The given TAN number is invalid.");
             this.invalidTan = true;
-            return "TransactionOverviewScreen.xhtml";
+            return "transactionOverviewScreen.xhtml";
         }
-        return "afterRegistrationViewWithTemplate.xhtml";
+        return "transactionConfirmationPage.xhtml";
     }
 
     public String goToTransactionOverviewScreen() throws senderNotEnoughMoneyException {
@@ -188,24 +191,32 @@ public class TransactionModel implements Serializable {
             transactionService.senderHasEnoughMoney(this.selectedSenderAccount, this.amount);
         } catch (senderNotEnoughMoneyException e) {
             if (e.getCredit() > -100) {
-//                this.logger.log(Level.SEVERE, "The sender needs a credit to execute the transaction.");
+                this.logger.log(Level.SEVERE, "The sender needs a credit to execute the transaction.");
                 this.senderNeedsCreditForTransaction = true;
                 this.senderAccountIsOutOfCreditRange = false;
                 this.transactionValid = true;
             } else {
-//                this.logger.log(Level.SEVERE, "The sender has not enough money to execute the transaction. No credit can be given.");
+                this.logger.log(Level.SEVERE, "The sender has not enough money to execute the transaction. No credit can be given.");
                 this.senderNeedsCreditForTransaction = false;
                 this.senderAccountIsOutOfCreditRange = true;
                 this.transactionValid = false;
             }
         } finally {
             if (accountService.getAccountByIban(this.receiverIban) == null) {
-//                this.logger.log(Level.SEVERE, "The receiver account could not be found.");
+                this.logger.log(Level.SEVERE, "The receiver account could not be found.");
                 this.receiverAccountNotFound = true;
             }
         }
 
-        return "TransactionOverviewScreen.xhtml";
+        return "transactionOverviewScreen.xhtml";
+    }
+
+    public String goToCustomerOverviewScreen() {
+        this.receiverIban = "";
+        this.receiverBic = "";
+        this.amount = 0.0;
+        this.description = "";
+        return "/views/customer/customerOverview.xhtml";
     }
 
 }

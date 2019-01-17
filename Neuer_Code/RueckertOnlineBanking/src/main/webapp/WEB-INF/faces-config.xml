@@ -5,4 +5,29 @@
               xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd">
 
 
+    <navigation-rule>
+        <from-view-id>*</from-view-id>
+
+        <navigation-case>
+            <from-outcome>overview</from-outcome>
+            <to-view-id>/views/customer/customerOverview.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>profile</from-outcome>
+            <to-view-id>/views/customer/customerProfile.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>accounts</from-outcome>
+            <to-view-id>/views/customer/customerAccounts.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>transactions</from-outcome>
+            <to-view-id>/views/customer/customerTransactions.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>moneyTransport</from-outcome>
+            <to-view-id>/views/moneyTransport/moneyTransport.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+
 </faces-config>

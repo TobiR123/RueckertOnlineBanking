@@ -23,14 +23,11 @@ public class Customer extends GeneratedIdEntity {
     private Address address;
     @OneToOne
     private PIN pinNumber;
-
-
-
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(cascade= CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.PERSIST)
     private List<TAN> tanNumbers;
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(cascade= CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.PERSIST)
     private List<Account> accounts;
 
 

@@ -29,6 +29,14 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/net.bootsfaces/bootsfaces -->
+        <dependency>
+            <groupId>net.bootsfaces</groupId>
+            <artifactId>bootsfaces</artifactId>
+            <version>1.4.1</version>
+            <scope>compile</scope>
+        </dependency>
+
 
         <!-- your dependencies here: -->
 

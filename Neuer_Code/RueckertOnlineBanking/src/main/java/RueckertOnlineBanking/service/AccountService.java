@@ -13,7 +13,8 @@ import java.util.List;
 @RequestScoped
 public class AccountService implements Serializable {
 
-    @PersistenceContext(unitName = "examplePU")
+    @PersistenceContext(unitName = "RueckertPU")
+    //@PersistenceContext(unitName = "examplePU")
     private EntityManager entityManager;
 
     @Transactional
