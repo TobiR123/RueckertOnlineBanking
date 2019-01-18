@@ -176,7 +176,10 @@ public class TransactionModel implements Serializable {
     public String executeTransaction() {
         Customer senderCustomer = this.customerModel.getLastRegistered();
         try {
-            Transaction successfulTransaction = transactionService.executeTransaction(this.selectedSenderAccount, senderCustomer, this.receiverIban, this.receiverBic, this.amount, this.description, this.tanNumber);
+            // Retrieve receiver account from db. Can be null if receiver account is not registered at our bank.
+            Account receiverAccount = this.accountService.getAccountByIban(this.receiverIban);
+            Transaction successfulTransaction = transactionService.executeTransaction(this.selectedSenderAccount, receiverAccount, this.amount, this.description, this.tanNumber);
+            //Transaction successfulTransaction = transactionService.executeTransaction(this.selectedSenderAccount, senderCustomer, this.receiverIban, this.receiverBic, this.amount, this.description, this.tanNumber);
 
             this.customerTransactions = this.transactionService.getCustomerTransactions(senderCustomer);
 

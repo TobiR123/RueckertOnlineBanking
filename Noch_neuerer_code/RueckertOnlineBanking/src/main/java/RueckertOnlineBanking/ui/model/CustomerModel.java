@@ -67,6 +67,7 @@ public class CustomerModel implements Serializable {
     private boolean pinTooShort = false;
 
 
+
     @Inject
     private CustomerService customerService;
     private boolean customerDeleted = false;
@@ -265,10 +266,13 @@ public class CustomerModel implements Serializable {
 
     public String registerCustomer() {
 
+        this.logger.log(Level.SEVERE, "IN METHOD REGISTER CUSTOMER!");
+
         this.tempCustomer.setAddress(this.tempAddress);
         this.tempCustomer.seteMailAddress(this.tempEmailAddress);
 
         try {
+            this.logger.log(Level.SEVERE, "IN THE TRY BLOCK OF REGISTER CUSTOMER!");
             this.lastRegistered = customerService.registerCustomer(tempCustomer);
 
             this.recentlyRegistered = true;
@@ -290,11 +294,12 @@ public class CustomerModel implements Serializable {
             this.customerTooYoung = true;
             return "index.xhtml";
         } catch (ParseException e) {
+            this.logger.log(Level.SEVERE, "PARSE EXCEPTION IN REGISTER CUSTOMER!");
 //            this.logger.log(Level.INFO, "Something went wrong while parsing the input values.");
             e.printStackTrace();
         }
         this.logger.log(Level.INFO, "Customer successful registered.");
-        return "customerOverview.xhtml";
+        return "/views/customer/customerOverview.xhtml";
     }
 
     public String updateCustomer() {

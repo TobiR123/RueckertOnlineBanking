@@ -4,8 +4,13 @@ import RueckertOnlineBanking.entity.util.GeneratedIdEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Objects;
 
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 public class Address extends GeneratedIdEntity {
 

@@ -34,10 +34,20 @@ public class TAN extends GeneratedIdEntity {
 
     @Override
     public String toString() {
-        return "TAN-Number: " +
-                this.tanNumber +
-                "transaction: " +
-                this.transaction;
+
+        String result;
+        if(this.transaction != null){
+            result = "TAN-Number: " +
+                    this.tanNumber +
+                    "transaction: " +
+                    this.transaction.getId();
+        } else {
+            result = "TAN-Number: " +
+                    this.tanNumber +
+                    "transaction: null";
+        }
+
+        return result;
     }
 
     @Override

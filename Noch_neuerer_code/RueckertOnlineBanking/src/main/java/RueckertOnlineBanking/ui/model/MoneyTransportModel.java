@@ -4,7 +4,9 @@ import RueckertOnlineBanking.entity.Account;
 import RueckertOnlineBanking.entity.Customer;
 import RueckertOnlineBanking.entity.customExceptions.senderNotEnoughMoneyException;
 import RueckertOnlineBanking.service.AccountService;
-//import RueckertOnlineBanking.service.MoneyTransportService;
+//import RueckertOnlineBanking.service.MoneyTransportServiceRemote;
+import RueckertOnlineBanking.service.MoneyTransportServiceIF;
+import RueckertOnlineBanking.service.MoneyTransportServiceRemote;
 import RueckertOnlineBanking.service.TransactionService;
 import RueckertOnlineBanking.ui.converter.SenderAccountConverter;
 import RueckertOnlineBanking.loggerFactory.LoggerFactory;
@@ -31,6 +33,8 @@ public class MoneyTransportModel implements Serializable {
     private SenderAccountConverter converterSelectedAccount;
     @Inject
     private TransactionService transactionService;
+    @Inject
+    private MoneyTransportServiceIF moneyTransportService;
     @Inject
     private LoggerFactory loggerFactory;
     private Logger logger;
@@ -110,13 +114,15 @@ public class MoneyTransportModel implements Serializable {
 
     // ##### METHODS ##### //
     public String executeMoneyTransport() {
+        this.moneyTransportService.callMoneyTransportCompany(customerModel.getLastRegistered(), this.amount);
+
         Customer updatedCustomer = this.transactionService.reduceAccountCredit(customerModel.getLastRegistered(), this.selectedAccount, this.amount);
         customerModel.setLastRegistered(updatedCustomer);
         this.moneyTransportValid = true;
         this.senderNeedsCreditForMoneyTransport = false;
         this.senderAccountIsOutOfCreditRange = false;
         this.amount = 0.0;
-        //this.moneyTransportService.sendNewMessage("HALLO KEVIN!!");
+
         return "moneyTransportConfirmationPage.xhtml";
     }
 

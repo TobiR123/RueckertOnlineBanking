@@ -4,7 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
 <h:head>
 
@@ -83,38 +84,57 @@
 
                     <h3>Deine existierenden Bankkonten:</h3>
 
-                    <h:dataTable var="account" value="#{customerModel.lastRegistered.accounts}">
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="Kontonummer" />
-                            </f:facet>
+
+                    <p:dataTable var="account" value="#{customerModel.lastRegistered.accounts}" tableStyle="width:auto">
+                        <p:column headerText="Kontonummer">
                             <h:outputText value="#{account.accountNumber}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="Bankleitzahl" />
-                            </f:facet>
+                        </p:column>
+                        <p:column headerText="Bankleitzahl">
                             <h:outputText value="#{account.bankCode}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="IBAN" />
-                            </f:facet>
+                        </p:column>
+                        <p:column headerText="IBAN">
                             <h:outputText value="#{account.iban}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="BIC" />
-                            </f:facet>
+                        </p:column>
+                        <p:column headerText="BIC">
                             <h:outputText value="#{account.bic}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="Guthaben" />
-                            </f:facet>
+                        </p:column>
+                        <p:column headerText="Guthaben">
                             <h:outputText value="#{account.credit}" />
-                        </h:column>
-                    </h:dataTable>
+                        </p:column>
+                    </p:dataTable>
+
+                    <!--<h:dataTable var="account" value="#{customerModel.lastRegistered.accounts}">-->
+                        <!--<h:column>-->
+                            <!--<f:facet name="header">-->
+                                <!--<h:outputText value="Kontonummer" />-->
+                            <!--</f:facet>-->
+                            <!--<h:outputText value="#{account.accountNumber}" />-->
+                        <!--</h:column>-->
+                        <!--<h:column>-->
+                            <!--<f:facet name="header">-->
+                                <!--<h:outputText value="Bankleitzahl" />-->
+                            <!--</f:facet>-->
+                            <!--<h:outputText value="#{account.bankCode}" />-->
+                        <!--</h:column>-->
+                        <!--<h:column>-->
+                            <!--<f:facet name="header">-->
+                                <!--<h:outputText value="IBAN" />-->
+                            <!--</f:facet>-->
+                            <!--<h:outputText value="#{account.iban}" />-->
+                        <!--</h:column>-->
+                        <!--<h:column>-->
+                            <!--<f:facet name="header">-->
+                                <!--<h:outputText value="BIC" />-->
+                            <!--</f:facet>-->
+                            <!--<h:outputText value="#{account.bic}" />-->
+                        <!--</h:column>-->
+                        <!--<h:column>-->
+                            <!--<f:facet name="header">-->
+                                <!--<h:outputText value="Guthaben" />-->
+                            <!--</f:facet>-->
+                            <!--<h:outputText value="#{account.credit}" />-->
+                        <!--</h:column>-->
+                    <!--</h:dataTable>-->
                     <br />
                     <h:panelGrid columns="2">
                         <h:commandButton value="Neues Konto erstellen" action="#{customerModel.addAccountToCustomer}" />
@@ -122,6 +142,33 @@
 
 
                     <h3>Deine durchgeführten Transaktionen:</h3>
+
+                    <!--<p:dataTable var="transaction" value="#{transactionModel.customerTransactions}" tableStyle="width:auto">-->
+                        <!--<p:column headerText="Sender-IBAN">-->
+                            <!--<h:outputText value="#{transaction.sender.iban}" />-->
+                        <!--</p:column>-->
+                        <!--<p:column headerText="Sender-BIC">-->
+                            <!--<h:outputText value="#{transaction.sender.bic}" />-->
+                        <!--</p:column>-->
+                        <!--<p:column headerText="Empfänger-IBAN">-->
+                            <!--<h:outputText value="#{transaction.receiver.iban}" />-->
+                        <!--</p:column>-->
+                        <!--<p:column headerText="Empfänger-BIC">-->
+                            <!--<h:outputText value="#{transaction.receiver.bic}" />-->
+                        <!--</p:column>-->
+                        <!--<p:column headerText="Betrag">-->
+                            <!--<h:outputText value="#{transaction.amount}" />-->
+                        <!--</p:column>-->
+                        <!--<p:column headerText="Verwendungszweck">-->
+                            <!--<h:outputText value="#{transaction.description}" />-->
+                        <!--</p:column>-->
+                        <!--<p:column headerText="TAN">-->
+                            <!--<h:outputText value="#{transaction.tan.tanNumber}" />-->
+                        <!--</p:column>-->
+                        <!--<p:column headerText="Zeitpunkt">-->
+                            <!--<h:outputText value="#{transaction.timestamp}" />-->
+                        <!--</p:column>-->
+                    <!--</p:dataTable>-->
 
                     <h:dataTable var="transaction" value="#{transactionModel.customerTransactions}" width="800px">
                         <h:column>

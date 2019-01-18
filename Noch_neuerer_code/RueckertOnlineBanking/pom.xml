@@ -30,12 +30,12 @@
             <scope>compile</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/net.bootsfaces/bootsfaces -->
-        <dependency>
+        <!--<dependency>
             <groupId>net.bootsfaces</groupId>
             <artifactId>bootsfaces</artifactId>
             <version>1.4.1</version>
             <scope>compile</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>

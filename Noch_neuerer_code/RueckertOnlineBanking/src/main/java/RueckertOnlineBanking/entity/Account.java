@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.Objects;
 import java.util.Random;
 
@@ -14,9 +15,13 @@ import java.util.Random;
 public class Account extends GeneratedIdEntity {
 
     private String iban;
+    @XmlTransient
     private String bic;
+    @XmlTransient
     private int bankCode;
+    @XmlTransient
     private long accountNumber;
+    @XmlTransient
     private double credit;
     //@ManyToOne
     //private Customer customer;
@@ -28,7 +33,7 @@ public class Account extends GeneratedIdEntity {
         this.accountNumber = this.generateAccountNumber();
         this.bic = "RUOBDE01"; // BIC stands for "Rueckert Online Banking DE 01".
         this.iban = this.generateIban();
-        this.credit = 0.0;
+        this.credit = 100.0;
         //this.customer = customer;
     }
 

@@ -40,3 +40,7 @@ a:link:hover, a:visited:hover  {
     color: red;
     font-weight: bold;
 }
+
+.tableInputFieldLarge {
+    width: 30px;
+}

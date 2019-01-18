@@ -11,6 +11,7 @@ import RueckertOnlineBanking.loggerFactory.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@WebService
 @RequestScoped
 public class TransactionService implements Serializable {
 
@@ -43,20 +45,29 @@ public class TransactionService implements Serializable {
 
     @Inject AccountService accountService;
 
-
+    @WebMethod(exclude = true)
     @Transactional(Transactional.TxType.REQUIRED)
-    public Transaction executeTransaction(Account senderAccount, Customer senderCustomer, String receiverIban, String receiverBic, double amount, String description, TAN tan) throws invalidTanException {
-        // Get the specific tan record of the customer from the database.
-        TAN tanRecord = this.customerService.getTanRecordOfCustomerByTanNumber(senderCustomer, tan.getTanNumber());
+    private Customer getCustomerByAccount(Account account) {
+        Customer c = new Customer();
 
-        senderCustomer = this.customerService.getCustomerById(senderCustomer.getId());
+        return c;
+    }
+
+    @WebMethod(exclude = false)
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public Transaction executeTransaction(Account senderAccount, Account receiverAccount, double amount, String description, TAN tan) throws invalidTanException {
+        Customer senderCustomer = this.customerService.getCustomerByAccount(senderAccount);
+
+        // Get the specific tan record of the customer from the database.
+        TAN tanRecord = this.customerService.getTanRecordOfCustomerByTanNumber(senderCustomer, tan);
+
+        //senderCustomer = this.customerService.getCustomerById(senderCustomer.getId());
 
         // Check if the given TAN belongs to the customer that executes the transaction.
         if(tanRecord == null) {
             throw new invalidTanException();
         } else {
             tanRecord = this.customerService.getTanById(tanRecord.getId());
-
 
             List<Account> senderAccountList = senderCustomer.getAccounts();
             // Retrieve sender account from database.
@@ -66,15 +77,16 @@ public class TransactionService implements Serializable {
             entityManager.persist(senderAccount);
 
             // Fetch the receiver account from database.
-            Account receiverAccount = accountService.getAccountByIban(receiverIban);
             if(receiverAccount != null) {
+                receiverAccount = this.accountService.getAccountById(receiverAccount.getId());
                 receiverAccount.setCredit(receiverAccount.getCredit() + amount);
             } else {
                 // In case the receiver account is not registered at our bank, still set the given values for it to store them in the transaction object.
                 receiverAccount = new Account();
-                receiverAccount.setIban(receiverIban);
-                receiverAccount.setBic(receiverBic);
+                receiverAccount.setIban(receiverAccount.getIban());
+                receiverAccount.setBic(receiverAccount.getBic());
             }
+            // Save the account even if it is not registered at our bank. Because of that we can track the transaction flow.
             entityManager.persist(receiverAccount);
 
             senderAccountList.set(indexOfSenderAccount, senderAccount);
@@ -95,7 +107,59 @@ public class TransactionService implements Serializable {
         }
     }
 
+//
+//    @Transactional(Transactional.TxType.REQUIRED)
+//    public Transaction executeTransaction(Account senderAccount, Customer senderCustomer, String receiverIban, String receiverBic, double amount, String description, TAN tan) throws invalidTanException {
+//        // Get the specific tan record of the customer from the database.
+//        TAN tanRecord = this.customerService.getTanRecordOfCustomerByTanNumber(senderCustomer, tan.getTanNumber());
+//
+//        senderCustomer = this.customerService.getCustomerById(senderCustomer.getId());
+//
+//        // Check if the given TAN belongs to the customer that executes the transaction.
+//        if(tanRecord == null) {
+//            throw new invalidTanException();
+//        } else {
+//            tanRecord = this.customerService.getTanById(tanRecord.getId());
+//
+//
+//            List<Account> senderAccountList = senderCustomer.getAccounts();
+//            // Retrieve sender account from database.
+//            senderAccount = this.accountService.getAccountById(senderAccount.getId());
+//            int indexOfSenderAccount = senderAccountList.indexOf(senderAccount);
+//            senderAccount.setCredit(senderAccount.getCredit() - amount);
+//            entityManager.persist(senderAccount);
+//
+//            // Fetch the receiver account from database.
+//            Account receiverAccount = accountService.getAccountByIban(receiverIban);
+//            if(receiverAccount != null) {
+//                receiverAccount.setCredit(receiverAccount.getCredit() + amount);
+//            } else {
+//                // In case the receiver account is not registered at our bank, still set the given values for it to store them in the transaction object.
+//                receiverAccount = new Account();
+//                receiverAccount.setIban(receiverIban);
+//                receiverAccount.setBic(receiverBic);
+//            }
+//            entityManager.persist(receiverAccount);
+//
+//            senderAccountList.set(indexOfSenderAccount, senderAccount);
+//            senderCustomer.setAccounts(senderAccountList);
+//
+//            Transaction transaction = new Transaction(senderAccount, receiverAccount, amount, description, tanRecord);
+//
+//            tanRecord.setTransaction(transaction);
+//            entityManager.persist(tanRecord);
+//
+//            entityManager.persist(transaction);
+//
+//            senderCustomer.removeTanNumber(tanRecord);
+//            entityManager.persist(senderCustomer);
+//
+//            this.logger.log(Level.INFO, "Successfully executed transaction.");
+//            return transaction;
+//        }
+//    }
 
+    @WebMethod(exclude = true)
     @Transactional(Transactional.TxType.REQUIRED)
     public boolean senderHasEnoughMoney(Account senderAccount, double amount) throws senderNotEnoughMoneyException {
         if(senderAccount.getCredit() - amount < 0.0) {
@@ -104,7 +168,7 @@ public class TransactionService implements Serializable {
             return true;
         }
     }
-
+    @WebMethod(exclude = true)
     @Transactional(Transactional.TxType.REQUIRED)
     public List<Transaction> getCustomerTransactions(Customer customer) {
         // A transaction object has always two accounts: a sender and a receiver.
@@ -136,6 +200,7 @@ public class TransactionService implements Serializable {
         return customerTransactions;
     }
 
+    @WebMethod(exclude = true)
     @Transactional(Transactional.TxType.REQUIRED)
     public Customer reduceAccountCredit(Customer customer, Account account, double amount) {
         Account originalAccount = this.accountService.getAccountById(account.getId());

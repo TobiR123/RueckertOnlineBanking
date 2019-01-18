@@ -9,6 +9,8 @@ import RueckertOnlineBanking.loggerFactory.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.jws.WebMethod;
+import javax.jws.WebService;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -28,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@WebService
 @RequestScoped
 public class CustomerService implements Serializable {
 
@@ -39,6 +42,7 @@ public class CustomerService implements Serializable {
     private LoggerFactory loggerFactory;
     private Logger logger;
 
+    @WebMethod(exclude = true)
     @PostConstruct
     public void init() {
         logger = loggerFactory.create();
@@ -47,11 +51,16 @@ public class CustomerService implements Serializable {
     @Inject
     private AccountService accountService;
 
+    @WebMethod(exclude = false)
     @Transactional(Transactional.TxType.REQUIRED)
     public Customer registerCustomer(Customer customer) throws emailAddressAlreadyInUseException, ParseException, customerTooYoungException {
-        // check if email address already exists.
-        if(this.checkIfEmailAddressAlreadyExists(customer.geteMailAddress())){
-            throw new emailAddressAlreadyInUseException(customer.geteMailAddress().getMailAddress());
+
+
+        if(customer.geteMailAddress() != null) {
+            // check if email address already exists.
+            if(this.checkIfEmailAddressAlreadyExists(customer.geteMailAddress())){
+                throw new emailAddressAlreadyInUseException(customer.geteMailAddress().getMailAddress());
+            }
         }
 
         if(!this.checkIfCustomerIsAdult(customer.getDateOfBirth())){
@@ -75,20 +84,24 @@ public class CustomerService implements Serializable {
         customer.addAccount(account);
 
         entityManager.persist(customer.getAddress());
-        entityManager.persist(customer.geteMailAddress());
-        entityManager.persist(customer);
+        if(customer.geteMailAddress() != null) {
+            entityManager.persist(customer.geteMailAddress());
 
-        EMailAddress systemEmailAddress = this.getSystemEmailAddressRecord();
-        String topic = "Ihre TAN-Nummern zum bestätigen Ihrer Transaktionen";
-        String message = customer.getTanNumbersAsString();
-        Email email = new Email(systemEmailAddress, customer.geteMailAddress(), topic, message);
-        entityManager.persist(email);
-        System.out.println("SENT EMAIL: " + email);
+            entityManager.persist(customer);
+
+            EMailAddress systemEmailAddress = this.getSystemEmailAddressRecord();
+            String topic = "Ihre TAN-Nummern zum bestätigen Ihrer Transaktionen";
+            String message = customer.getTanNumbersAsString();
+            Email email = new Email(systemEmailAddress, customer.geteMailAddress(), topic, message);
+            entityManager.persist(email);
+            System.out.println("SENT EMAIL: " + email);
+        }
 
         this.logger.log(Level.INFO, "Customer successfull registered.");
         return customer;
     }
 
+    @WebMethod(exclude = true)
     @Transactional(Transactional.TxType.REQUIRED)
     private boolean checkIfCustomerIsAdult(Date dateOfBirth) throws ParseException {
         long diff = new Date().getTime() - dateOfBirth.getTime();
@@ -100,6 +113,7 @@ public class CustomerService implements Serializable {
         return false;
     }
 
+    @WebMethod(exclude = true)
     @Transactional(Transactional.TxType.REQUIRED)
     private boolean checkIfEmailAddressAlreadyExists(EMailAddress eMailAddress) {
 
@@ -116,6 +130,7 @@ public class CustomerService implements Serializable {
         return false;
     }
 
+    @WebMethod(exclude = true)
     @Transactional(Transactional.TxType.REQUIRED)
     private EMailAddress getSystemEmailAddressRecord() {
         String systemEmailAddress = "tobias.rueckert@st.oth-regensburg.de";
@@ -137,6 +152,7 @@ public class CustomerService implements Serializable {
         return systemEmailAddressRecord;
     }
 
+    @WebMethod(exclude = true)
     @Transactional(Transactional.TxType.REQUIRED)
     public Customer loginCustomer(EMailAddress eMailAddress, PIN pin){
 
@@ -172,6 +188,7 @@ public class CustomerService implements Serializable {
         return customer.get(0);
     }
 
+    @WebMethod(exclude = true)
     @Transactional(Transactional.TxType.REQUIRED)
     public Customer updateCustomer(Customer customer) throws emailAddressAlreadyInUseException, pinTooShortException {
         Customer original = this.getCustomerById(customer.getId());
@@ -219,6 +236,7 @@ public class CustomerService implements Serializable {
         return original;
     }
 
+    @WebMethod(exclude = true)
     @Transactional(Transactional.TxType.REQUIRED)
     public Customer addAccountToCustomer(Customer customer) {
         Account newAccount = this.accountService.createAccount();
@@ -228,6 +246,7 @@ public class CustomerService implements Serializable {
         return original;
     }
 
+    @WebMethod(exclude = true)
     @Transactional(Transactional.TxType.REQUIRED)
     public void deleteCustomer(Customer customer) {
         List<Email> listOfEmailsToCustomer = this.getAllEmailsWhereCustomerIsReceiver(customer.geteMailAddress());
@@ -244,26 +263,32 @@ public class CustomerService implements Serializable {
         this.logger.log(Level.INFO, "Customer successfull deleted.");
     }
 
+    @WebMethod(exclude = true)
     public Customer getCustomerById(long id){
         return entityManager.find(Customer.class, id);
     }
 
+    @WebMethod(exclude = true)
     private EMailAddress getEMailAddressById(long id) {
         return entityManager.find(EMailAddress.class, id);
     }
 
+    @WebMethod(exclude = true)
     private Address getAddressById(long id){
         return entityManager.find(Address.class, id);
     }
 
+    @WebMethod(exclude = true)
     private PIN getPinById(long id){
         return entityManager.find(PIN.class, id);
     }
 
+    @WebMethod(exclude = true)
     public TAN getTanById(long id){
         return entityManager.find(TAN.class, id);
     }
 
+    @WebMethod(exclude = true)
     private List<Email> getAllEmailsWhereCustomerIsReceiver(EMailAddress eMailAddress) {
         TypedQuery<Email> emailQuery = entityManager.createQuery(
                 "SELECT  e FROM  Email  AS e WHERE e.to = :receiver",
@@ -273,24 +298,34 @@ public class CustomerService implements Serializable {
         return emailQuery.getResultList();
     }
 
-    public TAN getTanRecordOfCustomerByTanNumber(Customer customer, int number) {
+    @WebMethod(exclude = true)
+    public TAN getTanRecordOfCustomerByTanNumber(Customer customer, TAN tanNumber) {
         // Search for the tan record in the customers tan list by a given number.
         List<TAN> customerTans = customer.getTanNumbers();
         for (TAN tan : customerTans) {
-            if(tan.getTanNumber() == number){
+            if(tan.getTanNumber() == tanNumber.getTanNumber()){
                 return tan;
             }
         }
         return null;
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
-    public List<Customer> getCustomers(){
-        TypedQuery<Customer> query = entityManager.createQuery(
-                "SELECT c FROM Customer AS c",
-                Customer.class
-        );
-        return query.getResultList();
+    @WebMethod(exclude = true)
+    public Customer getCustomerByAccount(Account account) {
+        Query customerQuery1 = entityManager.createQuery(
+                "SELECT DISTINCT c FROM Customer c, IN (c.accounts) AS a WHERE a.iban = :iban");
+        customerQuery1.setParameter("iban", account.getIban());
+
+//        Query customerQuery = entityManager.createQuery(
+//                "SELECT c FROM Customer c JOIN c.accounts a JOIN a.id i WHERE a.iban = :iban");
+//        customerQuery.setParameter("iban", account.getIban());
+
+        List result = (customerQuery1.getResultList());
+        if((result).size() > 0){
+            return (Customer)customerQuery1.getResultList().get(0);
+        } else {
+            return null;
+        }
     }
 
 

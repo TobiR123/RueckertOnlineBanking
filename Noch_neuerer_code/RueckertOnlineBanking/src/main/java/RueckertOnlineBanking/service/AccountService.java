@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebService
 @RequestScoped
 public class AccountService implements Serializable {
 
@@ -33,7 +32,7 @@ public class AccountService implements Serializable {
         logger = loggerFactory.create();
     }
 
-    @WebMethod
+
     @Transactional(Transactional.TxType.REQUIRED)
     public Account createAccount() {
         Account account = new Account();

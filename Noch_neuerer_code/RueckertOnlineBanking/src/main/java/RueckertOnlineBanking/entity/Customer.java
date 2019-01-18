@@ -25,17 +25,21 @@ public class Customer extends GeneratedIdEntity {
     private EMailAddress eMailAddress;
 
     // TODO: TEELFONNUMMERN ALS ELEMENTCOLLECTION OF STRINGS ODER INT!!!!
+    @XmlTransient
     private int phoneNumber;
+
     private Date dateOfBirth;
     @OneToOne(orphanRemoval = true)
     private Address address;
     @OneToOne
+    @XmlTransient
     private PIN pinNumber;
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.PERSIST)
+    @XmlTransient
     private List<TAN> tanNumbers;
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(cascade = CascadeType.PERSIST)
+    //@LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private List<Account> accounts;
 
 
