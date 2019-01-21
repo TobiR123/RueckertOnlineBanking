@@ -3,19 +3,18 @@ package RueckertOnlineBanking.ui.model;
 import RueckertOnlineBanking.entity.Account;
 import RueckertOnlineBanking.entity.Customer;
 import RueckertOnlineBanking.entity.customExceptions.senderNotEnoughMoneyException;
-import RueckertOnlineBanking.service.AccountService;
+import RueckertOnlineBanking.service.*;
 //import RueckertOnlineBanking.service.MoneyTransportServiceRemote;
-import RueckertOnlineBanking.service.MoneyTransportServiceIF;
-import RueckertOnlineBanking.service.MoneyTransportServiceRemote;
-import RueckertOnlineBanking.service.TransactionService;
 import RueckertOnlineBanking.ui.converter.SenderAccountConverter;
 import RueckertOnlineBanking.loggerFactory.LoggerFactory;
+import richterMoneyTransport.TransportOrder;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,9 +23,12 @@ import java.util.logging.Logger;
 public class MoneyTransportModel implements Serializable {
     // ##### PROPERTIES ##### //
     private double amount;
+    private Date deliveryDate;
     private Account selectedAccount;
     @Inject
     private AccountService accountService;
+    @Inject
+    private CustomerService customerService;
     @Inject
     private CustomerModel customerModel;
     @Inject
@@ -112,9 +114,23 @@ public class MoneyTransportModel implements Serializable {
         this.creditAfter = creditAfter;
     }
 
+    public Date getDeliveryDate() {
+        return deliveryDate;
+    }
+
+    public void setDeliveryDate(Date deliveryDate) {
+        this.deliveryDate = deliveryDate;
+    }
+
     // ##### METHODS ##### //
     public String executeMoneyTransport() {
-        this.moneyTransportService.callMoneyTransportCompany(customerModel.getLastRegistered(), this.amount);
+        try {
+            TransportOrder createdOrder = this.moneyTransportService.callMoneyTransportCompany(customerModel.getLastRegistered(), this.amount, this.deliveryDate);
+            Customer updatedCustomer = this.customerService.addMoneyTransportOrderToCustomer(this.customerModel.getLastRegistered(), createdOrder);
+            this.customerModel.setLastRegistered(updatedCustomer);
+        }catch(Exception e){
+            return this.goToMoneyTransportErrorScreen();
+        }
 
         Customer updatedCustomer = this.transactionService.reduceAccountCredit(customerModel.getLastRegistered(), this.selectedAccount, this.amount);
         customerModel.setLastRegistered(updatedCustomer);
@@ -122,6 +138,7 @@ public class MoneyTransportModel implements Serializable {
         this.senderNeedsCreditForMoneyTransport = false;
         this.senderAccountIsOutOfCreditRange = false;
         this.amount = 0.0;
+
 
         return "moneyTransportConfirmationPage.xhtml";
     }
@@ -159,5 +176,5 @@ public class MoneyTransportModel implements Serializable {
 
     public String goToMoneyTransportScreen() { return "/views/moneyTransport/moneyTransport.xhtml"; }
 
-
+    public String goToMoneyTransportErrorScreen() {return "/views/moneyTransport/moneyTransportErrorScreen.xhtml";}
 }

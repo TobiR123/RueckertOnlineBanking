@@ -3,29 +3,37 @@ package RueckertOnlineBanking.entity;
 
 import RueckertOnlineBanking.entity.util.GeneratedIdEntity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.Date;
-import java.util.Objects;
 
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 public class Transaction extends GeneratedIdEntity {
 
 
-
+    @XmlTransient
     @ManyToOne
     private Account sender;
+    @XmlTransient
     @ManyToOne
     private Account receiver;
     private double amount;
     private String description;
     private Date timestamp;
+    @XmlTransient
     @OneToOne(mappedBy = "transaction")
     private TAN tan;
 
     public Transaction() {
         super.id = getId();
     }
-
 
     public Transaction(Account sender, Account receiver, double amount, String description, TAN tan) {
         this.sender = sender;
@@ -50,30 +58,6 @@ public class Transaction extends GeneratedIdEntity {
                 this.tan +
                 " Timestamp: " +
                 this.timestamp;
-    }
-
-    @Override
-    public boolean equals(Object o){
-        if( o == null) {
-            return false;
-        }
-        else if(getClass() != o.getClass()) {
-            return false;
-        }
-        final Transaction other = (Transaction) o;
-        if(!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        if(this.id == null) {
-            return 0;
-        } else {
-            return this.id.hashCode();
-        }
     }
 
     public Long getId() {

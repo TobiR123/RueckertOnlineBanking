@@ -17,7 +17,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "TransportOrderServiceService", targetNamespace = "http://service.richter.de/", wsdlLocation = "http://im-lamport:8080/richtermoneytransport-0.1/TransportOrderService?WSDL")
+@WebServiceClient(name = "TransportOrderServiceService", targetNamespace = "http://service.richter.de/", wsdlLocation = "http://im-lamport:8080/richtermoneytransport-0.1/TransportOrderService?wsdl")
 public class TransportOrderServiceService
     extends Service
 {
@@ -30,7 +30,7 @@ public class TransportOrderServiceService
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("http://im-lamport:8080/richtermoneytransport-0.1/TransportOrderService?WSDL");
+            url = new URL("http://im-lamport:8080/richtermoneytransport-0.1/TransportOrderService?wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }

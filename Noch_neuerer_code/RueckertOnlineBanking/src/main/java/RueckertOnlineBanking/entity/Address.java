@@ -3,11 +3,9 @@ package RueckertOnlineBanking.entity;
 import RueckertOnlineBanking.entity.util.GeneratedIdEntity;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Objects;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -32,37 +30,12 @@ public class Address extends GeneratedIdEntity {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "street: " + this.street +
                 " house number: " + this.houseNumber +
                 " postal code: " + this.postcode +
                 " place " + this.place;
     }
-
-    @Override
-    public boolean equals(Object o){
-        if( o == null) {
-            return false;
-        }
-        else if(getClass() != o.getClass()) {
-            return false;
-        }
-        final Address other = (Address) o;
-        if(!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        if(this.id == null) {
-            return 0;
-        } else {
-            return this.id.hashCode();
-        }
-    }
-
 
     ///// GETTER AND SETTER /////
     public Long getId() {
@@ -72,6 +45,7 @@ public class Address extends GeneratedIdEntity {
     public String getStreet() {
         return street;
     }
+
     public void setStreet(String street) {
         this.street = street;
     }
@@ -79,6 +53,7 @@ public class Address extends GeneratedIdEntity {
     public String getHouseNumber() {
         return houseNumber;
     }
+
     public void setHouseNumber(String houseNumber) {
         this.houseNumber = houseNumber;
     }
@@ -86,6 +61,7 @@ public class Address extends GeneratedIdEntity {
     public int getPostcode() {
         return postcode;
     }
+
     public void setPostcode(int postcode) {
         this.postcode = postcode;
     }
@@ -93,6 +69,7 @@ public class Address extends GeneratedIdEntity {
     public String getPlace() {
         return place;
     }
+
     public void setPlace(String place) {
         this.place = place;
     }

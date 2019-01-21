@@ -4,16 +4,15 @@ import RueckertOnlineBanking.entity.*;
 import RueckertOnlineBanking.entity.customExceptions.customerTooYoungException;
 import RueckertOnlineBanking.entity.customExceptions.emailAddressAlreadyInUseException;
 import RueckertOnlineBanking.entity.customExceptions.pinTooShortException;
+import RueckertOnlineBanking.loggerFactory.LoggerFactory;
 import RueckertOnlineBanking.service.CustomerService;
 import RueckertOnlineBanking.service.TransactionService;
-import RueckertOnlineBanking.loggerFactory.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -35,7 +34,7 @@ public class CustomerModel implements Serializable {
 
     // Login fields.
     private EMailAddress loginEmailAddress;
-    private PIN loginPin;
+    private int loginPin;
     private boolean invalidLogin = false;
 
     // Transaction of current customer.
@@ -66,7 +65,9 @@ public class CustomerModel implements Serializable {
     private String pinTooShortExceptionMessage;
     private boolean pinTooShort = false;
 
+    private String newPhoneNumber;
 
+    private TAN generateNewTansAuthenticationTan;
 
     @Inject
     private CustomerService customerService;
@@ -75,7 +76,6 @@ public class CustomerModel implements Serializable {
 
     public CustomerModel() {
         this.loginEmailAddress = new EMailAddress();
-        this.loginPin = new PIN();
 
         this.tempCustomer = new Customer();
         this.lastRegistered = new Customer();
@@ -86,6 +86,7 @@ public class CustomerModel implements Serializable {
         this.customerService = new CustomerService();
 
         this.transactions = new ArrayList<>();
+        this.generateNewTansAuthenticationTan = new TAN();
     }
 
     @PostConstruct
@@ -94,6 +95,15 @@ public class CustomerModel implements Serializable {
     }
 
     // ##### GETTER AND SETTER ##### //
+
+    public String getNewPhoneNumber() {
+        return newPhoneNumber;
+    }
+
+    public void setNewPhoneNumber(String newPhoneNumber) {
+        this.newPhoneNumber = newPhoneNumber;
+    }
+
     public boolean isCustomerSuccessfulRegisteredOrLoggedIn() {
         return customerSuccessfulRegisteredOrLoggedIn;
     }
@@ -158,13 +168,21 @@ public class CustomerModel implements Serializable {
         this.lastCreatedAccount = lastCreatedAccount;
     }
 
-    public boolean isRecentlyLoggedIn() { return recentlyLoggedIn; }
+    public boolean isRecentlyLoggedIn() {
+        return recentlyLoggedIn;
+    }
 
-    public void setRecentlyLoggedIn(boolean recentlyLoggedIn) { this.recentlyLoggedIn = recentlyLoggedIn; }
+    public void setRecentlyLoggedIn(boolean recentlyLoggedIn) {
+        this.recentlyLoggedIn = recentlyLoggedIn;
+    }
 
-    public boolean isRecentlyRegistered() { return recentlyRegistered; }
+    public boolean isRecentlyRegistered() {
+        return recentlyRegistered;
+    }
 
-    public void setRecentlyRegistered(boolean recentlyRegistered) { this.recentlyRegistered = recentlyRegistered; }
+    public void setRecentlyRegistered(boolean recentlyRegistered) {
+        this.recentlyRegistered = recentlyRegistered;
+    }
 
     public EMailAddress getLoginEmailAddress() {
         return loginEmailAddress;
@@ -174,11 +192,11 @@ public class CustomerModel implements Serializable {
         this.loginEmailAddress = loginEmailAddress;
     }
 
-    public PIN getLoginPin() {
+    public int getLoginPin() {
         return loginPin;
     }
 
-    public void setLoginPin(PIN loginPin) {
+    public void setLoginPin(int loginPin) {
         this.loginPin = loginPin;
     }
 
@@ -218,13 +236,17 @@ public class CustomerModel implements Serializable {
         return emailAddressAlreadyInUseExceptionMessage;
     }
 
-    public void setEmailAddressAlreadyInUseExceptionMessage(String emailAddressAlreadyInUseExceptionMessage) { this.emailAddressAlreadyInUseExceptionMessage = emailAddressAlreadyInUseExceptionMessage; }
+    public void setEmailAddressAlreadyInUseExceptionMessage(String emailAddressAlreadyInUseExceptionMessage) {
+        this.emailAddressAlreadyInUseExceptionMessage = emailAddressAlreadyInUseExceptionMessage;
+    }
 
     public boolean isDuplicateEmailAddress() {
         return duplicateEmailAddress;
     }
 
-    public void setDuplicateEmailAddress(boolean duplicateEmailAddress) { this.duplicateEmailAddress = duplicateEmailAddress; }
+    public void setDuplicateEmailAddress(boolean duplicateEmailAddress) {
+        this.duplicateEmailAddress = duplicateEmailAddress;
+    }
 
     public boolean isCustomerTooYoung() {
         return customerTooYoung;
@@ -242,6 +264,14 @@ public class CustomerModel implements Serializable {
         this.customerTooYoungExceptionMessage = customerTooYoungExceptionMessage;
     }
 
+    public TAN getGenerateNewTansAuthenticationTan() {
+        return generateNewTansAuthenticationTan;
+    }
+
+    public void setGenerateNewTansAuthenticationTan(TAN generateNewTansAuthenticationTan) {
+        this.generateNewTansAuthenticationTan = generateNewTansAuthenticationTan;
+    }
+
 
     // ##### METHODS ##### //
 
@@ -254,7 +284,7 @@ public class CustomerModel implements Serializable {
             this.lastRegistered = customer;
             this.logger.log(Level.INFO, "Successful login!");
             this.loginEmailAddress = new EMailAddress();
-            this.loginPin = new PIN();
+            this.loginPin = 0;
             this.customerSuccessfulRegisteredOrLoggedIn = true;
             return "customerOverview.xhtml";
         } else {
@@ -265,14 +295,14 @@ public class CustomerModel implements Serializable {
     }
 
     public String registerCustomer() {
-
-        this.logger.log(Level.SEVERE, "IN METHOD REGISTER CUSTOMER!");
-
         this.tempCustomer.setAddress(this.tempAddress);
         this.tempCustomer.seteMailAddress(this.tempEmailAddress);
 
+        if (this.newPhoneNumber != "") {
+            this.lastRegistered.addPhoneNumber(this.newPhoneNumber);
+        }
+
         try {
-            this.logger.log(Level.SEVERE, "IN THE TRY BLOCK OF REGISTER CUSTOMER!");
             this.lastRegistered = customerService.registerCustomer(tempCustomer);
 
             this.recentlyRegistered = true;
@@ -282,21 +312,18 @@ public class CustomerModel implements Serializable {
             this.tempAddress = new Address();
             this.tempEmailAddress = new EMailAddress();
             this.customerSuccessfulRegisteredOrLoggedIn = true;
+            this.newPhoneNumber = "";
 
         } catch (emailAddressAlreadyInUseException e) {
             this.logger.log(Level.SEVERE, "E-Mail address already in use.");
             this.emailAddressAlreadyInUseExceptionMessage = e.toString();
             this.duplicateEmailAddress = true;
-            return "index.xhtml";
+            return "/views/customer/index.xhtml";
         } catch (customerTooYoungException e) {
             this.logger.log(Level.SEVERE, "The customer is under 18 years old.");
             this.customerTooYoungExceptionMessage = e.toString();
             this.customerTooYoung = true;
             return "index.xhtml";
-        } catch (ParseException e) {
-            this.logger.log(Level.SEVERE, "PARSE EXCEPTION IN REGISTER CUSTOMER!");
-//            this.logger.log(Level.INFO, "Something went wrong while parsing the input values.");
-            e.printStackTrace();
         }
         this.logger.log(Level.INFO, "Customer successful registered.");
         return "/views/customer/customerOverview.xhtml";
@@ -304,14 +331,18 @@ public class CustomerModel implements Serializable {
 
     public String updateCustomer() {
         try {
+            if (this.newPhoneNumber != null && !this.newPhoneNumber.equals("")) {
+                this.lastRegistered.addPhoneNumber(this.newPhoneNumber);
+            }
             this.lastRegistered = customerService.updateCustomer(this.lastRegistered);
             this.transactionModel.setCustomerTransactions(this.transactionService.getCustomerTransactions(this.lastRegistered));
+            this.newPhoneNumber = "";
         } catch (emailAddressAlreadyInUseException e) {
             this.logger.log(Level.SEVERE, "E-Mail address already in use.");
             this.emailAddressAlreadyInUseExceptionMessage = e.toString();
             this.duplicateEmailAddress = true;
             return "editCustomer.xhtml";
-        } catch(pinTooShortException e){
+        } catch (pinTooShortException e) {
             this.logger.log(Level.SEVERE, "PIN to short.");
             this.pinTooShort = true;
             this.pinTooShortExceptionMessage = e.toString();
@@ -342,7 +373,6 @@ public class CustomerModel implements Serializable {
     }
 
     public String deleteCustomer() {
-        // TODO!
         customerService.deleteCustomer(this.lastRegistered);
         this.customerDeleted = true;
         this.lastRegistered = new Customer();
@@ -359,5 +389,32 @@ public class CustomerModel implements Serializable {
         return "newAccountAddedConfirmationPage.xhtml";
     }
 
+    public String removePhoneNumberFromEditCustomer(String phoneNumber) {
+        this.lastRegistered = this.customerService.removePhoneNumber(this.lastRegistered, phoneNumber);
+        return "/views/customer/editCustomer.xhtml";
+    }
+
+    public String addPhoneNumber() {
+        this.lastRegistered = this.customerService.addPhoneNumber(this.lastRegistered, this.newPhoneNumber);
+        this.newPhoneNumber = "";
+        return "/views/customer/editCustomer.xhtml";
+    }
+
+    public String goToTanGenerationScreen() {
+        return "/views/tan/tanGenerationRequestScreen.xhtml";
+    }
+
+    public String generateNewTans() {
+        // check if the given tan belongs to the customer.
+        boolean tanIsValid = this.customerService.checkIfTanIsValidForCustomer(this.lastRegistered, this.generateNewTansAuthenticationTan);
+        if (tanIsValid) {
+            // if true, generate new tans for the customer.
+            this.lastRegistered = this.customerService.generateTanNumbersForCustomer(20, this.lastRegistered);
+            this.generateNewTansAuthenticationTan.setTanNumber(0);
+            return "/views/tan/tansGeneratedConfirmationScreen.xhtml";
+        }
+        this.generateNewTansAuthenticationTan.setTanNumber(0);
+        return "/views/tan/tanGenerationErrorScreen.xhtml";
+    }
 
 }

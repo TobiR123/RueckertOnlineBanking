@@ -192,7 +192,7 @@ public class TransactionModel implements Serializable {
         return "transactionConfirmationPage.xhtml";
     }
 
-    public String goToTransactionOverviewScreen() throws senderNotEnoughMoneyException {
+    public String goToTransactionOverviewScreen() {
         try {
             this.selectedSenderAccount = this.accountService.getAccountById(this.selectedSenderAccount.getId());
             transactionService.senderHasEnoughMoney(this.selectedSenderAccount, this.amount);
@@ -215,7 +215,7 @@ public class TransactionModel implements Serializable {
             }
         }
 
-        return "transactionOverviewScreen.xhtml";
+        return "/views/transaction/transactionOverviewScreen.xhtml";
     }
 
     public String goToCustomerOverviewScreen() {

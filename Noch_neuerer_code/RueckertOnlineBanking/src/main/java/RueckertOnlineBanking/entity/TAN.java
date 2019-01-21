@@ -5,14 +5,20 @@ import RueckertOnlineBanking.entity.util.GeneratedIdEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
-import java.util.Objects;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.concurrent.ThreadLocalRandom;
 
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 public class TAN extends GeneratedIdEntity {
 
     private int tanNumber;
 
+    @XmlTransient
     @OneToOne
     private Transaction transaction;
 
@@ -24,9 +30,9 @@ public class TAN extends GeneratedIdEntity {
     private int generateTan() {
         // Generate a TAN number that consists of 6 digits.
         String actualTAN = "";
-        for(int i = 0; i < 6; i++) {
+        for (int i = 0; i < 6; i++) {
             // Generate numbers between 1 and 10. The 0 is excluded so that no leading 0s can appear.
-            int digit =  ThreadLocalRandom.current().nextInt(1, 10);
+            int digit = ThreadLocalRandom.current().nextInt(1, 10);
             actualTAN = actualTAN + String.valueOf(digit);
         }
         return Integer.parseInt(actualTAN);
@@ -34,9 +40,8 @@ public class TAN extends GeneratedIdEntity {
 
     @Override
     public String toString() {
-
         String result;
-        if(this.transaction != null){
+        if (this.transaction != null) {
             result = "TAN-Number: " +
                     this.tanNumber +
                     "transaction: " +
@@ -48,30 +53,6 @@ public class TAN extends GeneratedIdEntity {
         }
 
         return result;
-    }
-
-    @Override
-    public boolean equals(Object o){
-        if( o == null) {
-            return false;
-        }
-        else if(getClass() != o.getClass()) {
-            return false;
-        }
-        final TAN other = (TAN) o;
-        if(!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        if(this.id == null) {
-            return 0;
-        } else {
-            return this.id.hashCode();
-        }
     }
 
     public Long getId() {

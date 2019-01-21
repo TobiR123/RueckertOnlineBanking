@@ -6,8 +6,6 @@ import RueckertOnlineBanking.loggerFactory.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.jws.WebMethod;
-import javax.jws.WebService;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -38,8 +36,8 @@ public class AccountService implements Serializable {
         Account account = new Account();
         // Check if there already exists an account with the exact same IBAN.
         boolean accountAlreadyExists = this.checkIfAccountAlreadyExists(account);
-        if(accountAlreadyExists){
-            while(accountAlreadyExists) {
+        if (accountAlreadyExists) {
+            while (accountAlreadyExists) {
                 account = new Account();
                 accountAlreadyExists = this.checkIfAccountAlreadyExists(account);
             }
@@ -49,7 +47,6 @@ public class AccountService implements Serializable {
         return account;
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
     private boolean checkIfAccountAlreadyExists(Account account) {
 
         TypedQuery<Account> accountQuery = entityManager.createQuery(
@@ -59,19 +56,18 @@ public class AccountService implements Serializable {
         accountQuery.setParameter("ibanToCheck", account.getIban());
         List<Account> result = accountQuery.getResultList();
 
-        if(result.size() > 0){
+        if (result.size() > 0) {
             this.logger.log(Level.INFO, "Account already exists. Generate a new one.");
             return true;
         }
         return false;
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
-    public Account getAccountById(long accountId){
+    public Account getAccountById(long accountId) {
         return this.entityManager.find(Account.class, accountId);
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
+
     public Account getAccountByIban(String iban) {
         TypedQuery<Account> accountQuery = entityManager.createQuery(
                 "SELECT a FROM Account AS a WHERE a.iban = :iban",
@@ -79,7 +75,7 @@ public class AccountService implements Serializable {
         );
         accountQuery.setParameter("iban", iban);
         List<Account> result = accountQuery.getResultList();
-        if(result.size() > 0){
+        if (result.size() > 0) {
             return result.get(0);
         }
         return null;

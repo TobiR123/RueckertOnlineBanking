@@ -4,10 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
-
-<!-- Ganz wichtig: Wenn Daten zum Server geschickt werden sollen, IMMER form hinzufügen!
-// Ganz wichtig: Bei neuem Facelet IMMER body hinzufügen! -->
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
 <h:head>
 
@@ -32,51 +30,80 @@
                 <h:panelGrid rendered="#{customerModel.recentlyLoggedIn}" columns="1">
                     <h:outputText value="Hier standen bei der Registrierung deine TAN-Nummern. Ich hoffe, du hast dir diese aufgeschrieben ... " />
                 </h:panelGrid>
+                <h:outputText value="Sollten dir die TANs ausgehen oder falls du deine Nummern vergessen hast, kannst du einfach neue TANs generieren lassen: " />
+                <p:commandButton value="Neue TANs generieren" action="#{customerModel.goToTanGenerationScreen}" />
             </f:view>
         </ui:define>
         <ui:define name="content">
             <f:view>
-                <h2>Hier kannst du deine gespeicherten Daten bearbeiten:</h2>
+                <h1>Hier kannst du deine gespeicherten Daten bearbeiten:</h1>
                 <h:form>
-                    <h:panelGrid columns="2">
-                        <h:outputText value="Vorname:"/>
-                        <h:inputText value="#{customerModel.lastRegistered.firstname}"/>
+                    <h:panelGrid>
+                        <h:panelGrid columns="2">
+                            <h:outputText value="Vorname:"/>
+                            <p:inputText value="#{customerModel.lastRegistered.firstname}"/>
 
-                        <h:outputText value="Nachname:"/>
-                        <h:inputText value="#{customerModel.lastRegistered.lastname}"/>
+                            <h:outputText value="Nachname:"/>
+                            <p:inputText value="#{customerModel.lastRegistered.lastname}"/>
 
-                        <h:outputText value="#{customerModel.emailAddressAlreadyInUseExceptionMessage}" rendered="#{customerModel.duplicateEmailAddress}"/>
-                        <h:outputText value="" rendered="#{customerModel.duplicateEmailAddress}"/>
+                            <h:outputText value="#{customerModel.emailAddressAlreadyInUseExceptionMessage}" rendered="#{customerModel.duplicateEmailAddress}"/>
+                            <h:outputText value="" rendered="#{customerModel.duplicateEmailAddress}"/>
 
-                        <h:outputText value="E-Mail:"/>
-                        <h:inputText value="#{customerModel.lastRegistered.eMailAddress.mailAddress}"/>
+                            <h:outputText value="E-Mail:"/>
+                            <p:inputText value="#{customerModel.lastRegistered.eMailAddress.mailAddress}"/>
 
-                        <h:outputText value="Telefonnummer:"/>
-                        <h:inputText value="#{customerModel.lastRegistered.phoneNumber}" />
+                            <h:outputText value="#{customerModel.emailAddressAlreadyInUseExceptionMessage}" rendered="#{customerModel.duplicateEmailAddress}" />
+                            <p:inputText value="#{customerModel.lastRegistered.eMailAddress.mailAddress}" rendered="#{customerModel.duplicateEmailAddress}" />
 
-                        <h:outputText value="Geburtsdatum (Format YYYY-MM-DD):"/>
-                        <h:inputText value="#{customerModel.lastRegistered.dateOfBirth}" converter="dateOfBirthConverter"/>
+                            <h:outputText value="Telefonnummern:" />
+                            <h:dataTable var="phoneNumber" value="#{customerModel.lastRegistered.phoneNumbers}">
+                                <h:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Nummer" />
+                                    </f:facet>
+                                    <h:outputText value="#{phoneNumber}" />
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Aktion" />
+                                    </f:facet>
+                                    <h:commandButton value="Löschen" action="#{customerModel.removePhoneNumberFromEditCustomer(phoneNumber)}" />
+                                </h:column>
+                            </h:dataTable>
 
-                        <h:outputText value="Strasse:"/>
-                        <h:inputText value="#{customerModel.lastRegistered.address.street}" />
+                            <h:outputText value="Nummer hinzufügen: " />
+                            <p:inputText value="#{customerModel.newPhoneNumber}" />
 
-                        <h:outputText value="Hausnummer:"/>
-                        <h:inputText value="#{customerModel.lastRegistered.address.houseNumber}" />
+                            <h:outputText value="" />
+                            <h:commandButton value="Hinzufügen" action="#{customerModel.addPhoneNumber}" />
 
-                        <h:outputText value="Postleitzahl:"/>
-                        <h:inputText value="#{customerModel.lastRegistered.address.postcode}" />
+                            <p:outputLabel for="popup" value="Geburtsdatum (Format DD/MM/YY):" />
+                            <p:calendar id="popup" value="#{customerModel.lastRegistered.dateOfBirth}" />
 
-                        <h:outputText value="Ort:"/>
-                        <h:inputText value="#{customerModel.lastRegistered.address.place}" />
+                            <p:outputLabel value="#{customerModel.customerTooYoungExceptionMessage}" rendered="#{customerModel.customerTooYoung}"/>
+                            <p:outputLabel value="" rendered="#{customerModel.customerTooYoung}"/>
 
-                        <h:outputText value="PIN:"/>
-                        <h:inputText value="#{customerModel.lastRegistered.pinNumber.pinNumber}"/>
+                            <h:outputText value="Strasse:"/>
+                            <p:inputText value="#{customerModel.lastRegistered.address.street}" />
 
-                        <h:outputText value="#{customerModel.pinTooShortExceptionMessage}" rendered="#{customerModel.pinTooShort}" />
-                        <h:outputText value="" rendered="#{customerModel.pinTooShort}" />
+                            <h:outputText value="Hausnummer:"/>
+                            <p:inputText value="#{customerModel.lastRegistered.address.houseNumber}" />
 
+                            <h:outputText value="Postleitzahl:"/>
+                            <p:inputText value="#{customerModel.lastRegistered.address.postcode}" />
+
+                            <h:outputText value="Ort:"/>
+                            <p:inputText value="#{customerModel.lastRegistered.address.place}" />
+
+                            <h:outputText value="PIN:"/>
+                            <p:inputText value="#{customerModel.lastRegistered.pinNumber.pinNumber}"/>
+
+                            <h:outputText value="#{customerModel.pinTooShortExceptionMessage}" rendered="#{customerModel.pinTooShort}" />
+                            <h:outputText value="" rendered="#{customerModel.pinTooShort}" />
+
+                        </h:panelGrid>
+                        <p:commandButton value="Speichern" action="#{customerModel.updateCustomer}" update="@form" />
                     </h:panelGrid>
-                    <h:commandButton value="Speichern" action="#{customerModel.updateCustomer}"/>
                 </h:form>
             </f:view>
         </ui:define>

@@ -4,7 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
 <h:head>
 
@@ -31,64 +32,45 @@
                 <h:panelGrid rendered="#{customerModel.recentlyLoggedIn}" columns="1">
                     <h:outputText value="Hier standen bei der Registrierung deine TAN-Nummern. Ich hoffe, du hast dir diese aufgeschrieben ... " />
                 </h:panelGrid>
+                <h:outputText value="Sollten dir die TANs ausgehen oder falls du deine Nummern vergessen hast, kannst du einfach neue TANs generieren lassen: " />
+                <p:commandButton value="Neue TANs generieren" action="#{customerModel.goToTanGenerationScreen}" />
             </f:view>
         </ui:define>
         <ui:define name="content">
             <f:view>
-                <h2>Deine durchgeführten Transaktionen:</h2>
+                <h1>Deine durchgeführten Transaktionen:</h1>
                 <h:form>
-                    <h:dataTable var="transaction" value="#{transactionModel.customerTransactions}" width="800px">
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="Sender-IBAN" />
-                            </f:facet>
-                            <h:outputText value="#{transaction.sender.iban}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="Sender-BIC" />
-                            </f:facet>
-                            <h:outputText value="#{transaction.sender.bic}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="Empfänger-IBAN" />
-                            </f:facet>
-                            <h:outputText value="#{transaction.receiver.iban}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="Empfänger-BIC" />
-                            </f:facet>
-                            <h:outputText value="#{transaction.receiver.bic}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="Betrag" />
-                            </f:facet>
-                            <h:outputText value="#{transaction.amount}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="Verwendungszweck" />
-                            </f:facet>
-                            <h:outputText value="#{transaction.description}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="TAN" />
-                            </f:facet>
-                            <h:outputText value="#{transaction.tan.tanNumber}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="Zeitpunkt" />
-                            </f:facet>
-                            <h:outputText value="#{transaction.timestamp}" />
-                        </h:column>
-                    </h:dataTable>
+                    <h:panelGrid>
+                        <p:dataTable var="transaction" value="#{transactionModel.customerTransactions}" tableStyle="width:auto">
+                            <p:column headerText="Sender-IBAN">
+                                <h:outputText value="#{transaction.sender.iban}" />
+                            </p:column>
+                            <p:column headerText="Sender-BIC">
+                                <h:outputText value="#{transaction.sender.bic}" />
+                            </p:column>
+                            <p:column headerText="Empfänger-IBAN">
+                                <h:outputText value="#{transaction.receiver.iban}" />
+                            </p:column>
+                            <p:column headerText="Empfänger-BIC">
+                                <h:outputText value="#{transaction.receiver.bic}" />
+                            </p:column>
+                            <p:column headerText="Betrag">
+                                <h:outputText value="#{transaction.amount}" />
+                            </p:column>
+                            <p:column headerText="Verwendungszweck">
+                                <h:outputText value="#{transaction.description}" />
+                            </p:column>
+                            <p:column headerText="TAN">
+                                <h:outputText value="#{transaction.tan.tanNumber}" />
+                            </p:column>
+                            <p:column headerText="Zeitpunkt">
+                                <h:outputText value="#{transaction.timestamp}" />
+                            </p:column>
+                        </p:dataTable>
 
-                    <h:commandButton value="Neue Transaktion durchführen" action="#{customerModel.goToTransactionScreen}" rendered="#{customerModel.customerSuccessfulRegisteredOrLoggedIn}"/>
+                        <p:commandButton value="Neue Transaktion durchführen" action="#{customerModel.goToTransactionScreen}" rendered="#{customerModel.customerSuccessfulRegisteredOrLoggedIn}"/>
+
+                    </h:panelGrid>
                 </h:form>
             </f:view>
         </ui:define>

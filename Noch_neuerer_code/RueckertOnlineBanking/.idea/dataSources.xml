@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="reverent_fermi@im-knuth.oth-regensburg.de" uuid="59dfccb6-86ee-4004-a05c-f5d587d598fd">
+    <data-source source="LOCAL" name="grave_hypatia@im-knuth.oth-regensburg.de" uuid="d9776be6-ad65-4b6d-9d98-34b5884b1e84">
       <driver-ref>mysql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://im-knuth.oth-regensburg.de:3306/reverent_fermi</jdbc-url>
+      <jdbc-url>jdbc:mysql://im-knuth.oth-regensburg.de:3306/grave_hypatia</jdbc-url>
+      <driver-properties>
+        <property name="autoReconnect" value="true" />
+        <property name="zeroDateTimeBehavior" value="convertToNull" />
+        <property name="tinyInt1isBit" value="false" />
+        <property name="characterEncoding" value="utf8" />
+        <property name="characterSetResults" value="utf8" />
+        <property name="yearIsDateType" value="false" />
+      </driver-properties>
+    </data-source>
+    <data-source source="LOCAL" name="sick_brown@im-knuth.oth-regensburg.de" uuid="1d2e7544-b859-4880-a37b-dedda87ccf1b">
+      <driver-ref>mysql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://im-knuth.oth-regensburg.de:3306/sick_brown</jdbc-url>
       <driver-properties>
         <property name="autoReconnect" value="true" />
         <property name="zeroDateTimeBehavior" value="convertToNull" />

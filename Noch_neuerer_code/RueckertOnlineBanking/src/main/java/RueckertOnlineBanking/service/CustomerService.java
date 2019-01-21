@@ -17,17 +17,8 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @WebService
@@ -35,12 +26,13 @@ import java.util.logging.Logger;
 public class CustomerService implements Serializable {
 
     @PersistenceContext(unitName = "RueckertPU")
-    //@PersistenceContext(unitName = "examplePU")
     private EntityManager entityManager;
 
     @Inject
     private LoggerFactory loggerFactory;
     private Logger logger;
+    @Inject
+    private AccountService accountService;
 
     @WebMethod(exclude = true)
     @PostConstruct
@@ -48,33 +40,28 @@ public class CustomerService implements Serializable {
         logger = loggerFactory.create();
     }
 
-    @Inject
-    private AccountService accountService;
-
     @WebMethod(exclude = false)
-    @Transactional(Transactional.TxType.REQUIRED)
-    public Customer registerCustomer(Customer customer) throws emailAddressAlreadyInUseException, ParseException, customerTooYoungException {
-
-
-        if(customer.geteMailAddress() != null) {
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public Customer registerCustomer(Customer customer) throws emailAddressAlreadyInUseException, customerTooYoungException {
+        // Check if email address is already in use.
+        if ((customer.geteMailAddress() != null) && (!customer.geteMailAddress().getMailAddress().equals(""))) {
             // check if email address already exists.
-            if(this.checkIfEmailAddressAlreadyExists(customer.geteMailAddress())){
+            if (this.checkIfEmailAddressAlreadyExists(customer.geteMailAddress())) {
                 throw new emailAddressAlreadyInUseException(customer.geteMailAddress().getMailAddress());
             }
         }
 
-        if(!this.checkIfCustomerIsAdult(customer.getDateOfBirth())){
+        // Check if customer is adult.
+        if (!this.checkIfCustomerIsAdult(customer.getDateOfBirth())) {
             throw new customerTooYoungException();
         }
 
         Account account = this.accountService.createAccount();
 
         PIN pin = new PIN();
-        pin.setPinNumber(pin.generatePin());
-        entityManager.persist(pin);
 
         // generate 20 TAN numbers for customer.
-        for(int i = 0; i < 20; i++) {
+        for (int i = 0; i < 20; i++) {
             TAN tan = new TAN();
             entityManager.persist(tan);
             customer.addTanNumber(tan);
@@ -84,9 +71,9 @@ public class CustomerService implements Serializable {
         customer.addAccount(account);
 
         entityManager.persist(customer.getAddress());
-        if(customer.geteMailAddress() != null) {
+        if (customer.geteMailAddress() != null) {
+            // Create a new email record which contains the tan numbers for the customer.
             entityManager.persist(customer.geteMailAddress());
-
             entityManager.persist(customer);
 
             EMailAddress systemEmailAddress = this.getSystemEmailAddressRecord();
@@ -94,27 +81,26 @@ public class CustomerService implements Serializable {
             String message = customer.getTanNumbersAsString();
             Email email = new Email(systemEmailAddress, customer.geteMailAddress(), topic, message);
             entityManager.persist(email);
-            System.out.println("SENT EMAIL: " + email);
-        }
 
-        this.logger.log(Level.INFO, "Customer successfull registered.");
+            // Further functionality to send the email record to the customer has to be implemented at this place.
+        }
+        entityManager.persist(customer);
+
         return customer;
     }
 
     @WebMethod(exclude = true)
-    @Transactional(Transactional.TxType.REQUIRED)
-    private boolean checkIfCustomerIsAdult(Date dateOfBirth) throws ParseException {
+    private boolean checkIfCustomerIsAdult(Date dateOfBirth) {
         long diff = new Date().getTime() - dateOfBirth.getTime();
-        int diffInDays = (int)(diff / (24 * 60 * 60 * 1000));
+        int diffInDays = (int) (diff / (24 * 60 * 60 * 1000));
 
-        if(diffInDays / 365 >= 18){
+        if (diffInDays / 365 >= 18) {
             return true;
         }
         return false;
     }
 
     @WebMethod(exclude = true)
-    @Transactional(Transactional.TxType.REQUIRED)
     private boolean checkIfEmailAddressAlreadyExists(EMailAddress eMailAddress) {
 
         TypedQuery<EMailAddress> emailAddressQuery = entityManager.createQuery(
@@ -124,25 +110,25 @@ public class CustomerService implements Serializable {
         emailAddressQuery.setParameter("emailToCheck", eMailAddress.getMailAddress());
         List<EMailAddress> result = emailAddressQuery.getResultList();
 
-        if(result.size() > 0){
+        if (result.size() > 0) {
             return true;
         }
         return false;
     }
 
     @WebMethod(exclude = true)
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(Transactional.TxType.MANDATORY)
     private EMailAddress getSystemEmailAddressRecord() {
-        String systemEmailAddress = "tobias.rueckert@st.oth-regensburg.de";
+        String systemEmailAddress = "rueckertonlinebanking@sampleProvider.de";
 
         TypedQuery<EMailAddress> systemEmailAddressQuery = entityManager.createQuery(
                 "SELECT  m FROM  EMailAddress  AS m WHERE m.mailAddress = :systemEmail",
                 EMailAddress.class
         );
         systemEmailAddressQuery.setParameter("systemEmail", systemEmailAddress);
-        List<EMailAddress> result = (List<EMailAddress>)systemEmailAddressQuery.getResultList();
+        List<EMailAddress> result = systemEmailAddressQuery.getResultList();
 
-        if(result.size() > 0) {
+        if (result.size() > 0) {
             return result.get(0);
         }
 
@@ -153,8 +139,8 @@ public class CustomerService implements Serializable {
     }
 
     @WebMethod(exclude = true)
-    @Transactional(Transactional.TxType.REQUIRED)
-    public Customer loginCustomer(EMailAddress eMailAddress, PIN pin){
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public Customer loginCustomer(EMailAddress eMailAddress, int pin) {
 
         // ##### Get the email record with the given address from the database. ##### //
         TypedQuery<EMailAddress> emailAddressQuery = entityManager.createQuery(
@@ -162,8 +148,8 @@ public class CustomerService implements Serializable {
                 EMailAddress.class
         );
         emailAddressQuery.setParameter("emailAddress", eMailAddress.getMailAddress());
-        List<EMailAddress> eMailAddresses= emailAddressQuery.getResultList();
-        if(eMailAddresses.size() == 0){
+        List<EMailAddress> eMailAddresses = emailAddressQuery.getResultList();
+        if (eMailAddresses.size() == 0) {
             return null;
         }
         EMailAddress eMailAddressRecord = eMailAddresses.get(0);
@@ -175,34 +161,33 @@ public class CustomerService implements Serializable {
                 Customer.class
         );
         customerQuery.setParameter("eMailAddressRecord", eMailAddressRecord);
-        customerQuery.setParameter("pin", pin.getPinNumber());
+        customerQuery.setParameter("pin", pin);
 
 
         List<Customer> customer = customerQuery.getResultList();
         System.out.println(customer);
 
-        if(customer.size() == 0) {
+        if (customer.size() == 0) {
             return null;
         }
-        this.logger.log(Level.INFO, "Customer successfull logged in.");
         return customer.get(0);
     }
 
     @WebMethod(exclude = true)
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     public Customer updateCustomer(Customer customer) throws emailAddressAlreadyInUseException, pinTooShortException {
         Customer original = this.getCustomerById(customer.getId());
 
         // Check if e-mail address is the same as before. If not, check if the new one is available.
-        if(!original.geteMailAddress().getMailAddress().equals(customer.geteMailAddress().getMailAddress())){
-            if(this.checkIfEmailAddressAlreadyExists(customer.geteMailAddress())){
+        if (!original.geteMailAddress().getMailAddress().equals(customer.geteMailAddress().getMailAddress())) {
+            if (this.checkIfEmailAddressAlreadyExists(customer.geteMailAddress())) {
                 throw new emailAddressAlreadyInUseException(customer.geteMailAddress().getMailAddress());
             }
         }
 
         int newPin = customer.getPinNumber().getPinNumber();
         int length = String.valueOf(newPin).length();
-        if(length < 6){
+        if (length < 6) {
             throw new pinTooShortException(newPin);
         }
 
@@ -214,7 +199,7 @@ public class CustomerService implements Serializable {
         entityManager.persist(originalEmailAddress);
         original.seteMailAddress(originalEmailAddress);
 
-        original.setPhoneNumber(customer.getPhoneNumber());
+        original.setPhoneNumbers(customer.getPhoneNumbers());
         original.setDateOfBirth(customer.getDateOfBirth());
 
         Address originalAddress = this.getAddressById(customer.getAddress().getId());
@@ -225,14 +210,12 @@ public class CustomerService implements Serializable {
         entityManager.persist(originalAddress);
         original.setAddress(originalAddress);
 
-        PIN originalPin = this.getPinById(customer.getPinNumber().getId());
+        PIN originalPin = customer.getPinNumber();
         originalPin.setPinNumber(customer.getPinNumber().getPinNumber());
-        entityManager.persist(originalPin);
         original.setPinNumber(originalPin);
 
         entityManager.persist(original);
 
-        //this.logger.log(Level.INFO, "Customer successfull updated.");
         return original;
     }
 
@@ -247,7 +230,7 @@ public class CustomerService implements Serializable {
     }
 
     @WebMethod(exclude = true)
-    @Transactional(Transactional.TxType.REQUIRED)
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void deleteCustomer(Customer customer) {
         List<Email> listOfEmailsToCustomer = this.getAllEmailsWhereCustomerIsReceiver(customer.geteMailAddress());
         for (Email e :
@@ -257,14 +240,13 @@ public class CustomerService implements Serializable {
 
         // NOTE: Address must not be deleted via persistence manager, because it is marked as orphanRemoval = true in Customer entity!
         // Because no other reference on the address record exists, it will be deleted automatically.
+
         entityManager.remove(this.getEMailAddressById(customer.geteMailAddress().getId()));
-        entityManager.remove(this.getPinById(customer.getPinNumber().getId()));
         entityManager.remove(this.getCustomerById(customer.getId()));
-        this.logger.log(Level.INFO, "Customer successfull deleted.");
     }
 
     @WebMethod(exclude = true)
-    public Customer getCustomerById(long id){
+    public Customer getCustomerById(long id) {
         return entityManager.find(Customer.class, id);
     }
 
@@ -274,17 +256,12 @@ public class CustomerService implements Serializable {
     }
 
     @WebMethod(exclude = true)
-    private Address getAddressById(long id){
+    private Address getAddressById(long id) {
         return entityManager.find(Address.class, id);
     }
 
     @WebMethod(exclude = true)
-    private PIN getPinById(long id){
-        return entityManager.find(PIN.class, id);
-    }
-
-    @WebMethod(exclude = true)
-    public TAN getTanById(long id){
+    public TAN getTanById(long id) {
         return entityManager.find(TAN.class, id);
     }
 
@@ -303,30 +280,90 @@ public class CustomerService implements Serializable {
         // Search for the tan record in the customers tan list by a given number.
         List<TAN> customerTans = customer.getTanNumbers();
         for (TAN tan : customerTans) {
-            if(tan.getTanNumber() == tanNumber.getTanNumber()){
-                return tan;
+            if (tan.getTanNumber() == tanNumber.getTanNumber()) {
+                return this.getTanById(tan.getId());
+            }
+        }
+
+        return null;
+    }
+
+    @WebMethod(exclude = true)
+    public Customer getCustomerByAccount(Account account) {
+
+        Query customerQuery = entityManager.createQuery(
+                "SELECT customer FROM Customer AS customer"
+        );
+        List<Customer> customers = customerQuery.getResultList();
+
+        for (Customer c :
+                customers) {
+            List<Account> accounts = c.getAccounts();
+            for (Account a :
+                    accounts) {
+                if (a.getIban().equals(account.getIban())) {
+                    return c;
+                }
             }
         }
         return null;
     }
 
     @WebMethod(exclude = true)
-    public Customer getCustomerByAccount(Account account) {
-        Query customerQuery1 = entityManager.createQuery(
-                "SELECT DISTINCT c FROM Customer c, IN (c.accounts) AS a WHERE a.iban = :iban");
-        customerQuery1.setParameter("iban", account.getIban());
-
-//        Query customerQuery = entityManager.createQuery(
-//                "SELECT c FROM Customer c JOIN c.accounts a JOIN a.id i WHERE a.iban = :iban");
-//        customerQuery.setParameter("iban", account.getIban());
-
-        List result = (customerQuery1.getResultList());
-        if((result).size() > 0){
-            return (Customer)customerQuery1.getResultList().get(0);
-        } else {
-            return null;
-        }
+    @Transactional(Transactional.TxType.REQUIRED)
+    public Customer removePhoneNumber(Customer customer, String phoneNumber) {
+        customer = this.getCustomerById(customer.getId());
+        customer = customer.removePhoneNumber(phoneNumber);
+        entityManager.persist(customer);
+        return customer;
     }
 
+    @WebMethod(exclude = true)
+    @Transactional(Transactional.TxType.REQUIRED)
+    public Customer addPhoneNumber(Customer customer, String phoneNumber) {
+        customer = this.getCustomerById(customer.getId());
+        customer = customer.addPhoneNumber(phoneNumber);
+        entityManager.persist(customer);
+        return customer;
+    }
+
+    @WebMethod(exclude = true)
+    @Transactional(Transactional.TxType.REQUIRED)
+    public Customer addMoneyTransportOrderToCustomer(Customer customer, richterMoneyTransport.TransportOrder transportOrder) {
+        // Create new own entity with the most important attributes from the foreign entity.
+        RueckertOnlineBanking.entity.MoneyTransportOrder reducedTransportOrder = new RueckertOnlineBanking.entity.MoneyTransportOrder(transportOrder.getId(), transportOrder.getAmount(), transportOrder.getExecutionDay().toGregorianCalendar().getTime());
+        customer = this.getCustomerById(customer.getId());
+        customer = customer.addMoneyTransportOrder(reducedTransportOrder);
+        entityManager.persist(reducedTransportOrder);
+        entityManager.persist(customer);
+        return customer;
+    }
+
+    @WebMethod(exclude = true)
+    @Transactional(Transactional.TxType.REQUIRED)
+    public Customer generateTanNumbersForCustomer(int number, Customer customer) {
+        customer = this.getCustomerById(customer.getId());
+        // generate TAN numbers for customer.
+        for (int i = 0; i < number; i++) {
+            TAN tan = new TAN();
+            entityManager.persist(tan);
+            customer.addTanNumber(tan);
+        }
+        entityManager.persist(customer);
+        return customer;
+    }
+
+    @WebMethod(exclude = true)
+    public boolean checkIfTanIsValidForCustomer(Customer customer, TAN tan){
+        // Check if tan belongs to customer by reference to the tan number.
+        List<TAN> customerTans = customer.getTanNumbers();
+        for (TAN t:
+             customerTans) {
+            if(t.getTanNumber() == tan.getTanNumber()){
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

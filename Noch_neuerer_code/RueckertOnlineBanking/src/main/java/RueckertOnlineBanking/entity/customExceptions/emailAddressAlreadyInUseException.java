@@ -2,12 +2,10 @@ package RueckertOnlineBanking.entity.customExceptions;
 
 public class emailAddressAlreadyInUseException extends Exception {
 
-    private String mailAddress = "";
     private String message;
 
     public emailAddressAlreadyInUseException(String mailAddress) {
-        this.mailAddress = mailAddress;
-        this.message = "Die Email-Adresse " + this.mailAddress + " wird bereits benutzt. Bitte wähle eine andere:";
+        this.message = "Die Email-Adresse " + mailAddress + " wird bereits benutzt. Bitte wähle eine andere:";
     }
 
     @Override

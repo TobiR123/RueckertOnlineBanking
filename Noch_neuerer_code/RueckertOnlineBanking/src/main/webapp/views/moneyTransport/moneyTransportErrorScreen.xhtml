@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+
+
+</h:head>
+
+
+<h:body>
+    <ui:composition template="../../WEB-INF/templates/basicTemplate.xhtml">
+        <ui:define name="left">
+            <f:view>
+                <h:panelGrid rendered="#{customerModel.recentlyRegistered}" columns="1">
+                    <h:outputText value="Hier siehst du deine TAN-Nummern, die du  zur Bestätigung von Transaktionen benötigst." />
+                    <h:outputText value="VORSICHT: Schreib dir diese TANs am Besten irgendwo auf! Diese werden dir bei allen weiteren Logins NCIHT wieder angezeigt!!!" />
+                    <h:dataTable var="tan" value="#{customerModel.lastRegistered.tanNumbers}">
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="TAN" />
+                            </f:facet>
+                            <h:outputText value="#{tan.tanNumber}" />
+                        </h:column>
+                    </h:dataTable>
+                </h:panelGrid>
+                <h:panelGrid rendered="#{customerModel.recentlyLoggedIn}" columns="1">
+                    <h:outputText value="Hier standen bei der Registrierung deine TAN-Nummern. Ich hoffe, du hast dir diese aufgeschrieben ... " />
+                </h:panelGrid>
+                <h:outputText value="Sollten dir die TANs ausgehen oder falls du deine Nummern vergessen hast, kannst du einfach neue TANs generieren lassen: " />
+                <p:commandButton value="Neue TANs generieren" action="#{customerModel.goToTanGenerationScreen}" />
+            </f:view>
+        </ui:define>
+        <ui:define name="content">
+            <f:view>
+                <h1>Ihr Geldtransport konnte leider nicht beauftragt werden!</h1>
+                <h:form>
+                    <h:panelGrid>
+                        <h2>Leider ist der externe Dienstleister momentan nicht erreichbar :-(</h2>
+                        <h2>Probier es doch einfach später noch einmal! :-) </h2>
+
+                        <p:commandButton value="Zur Übersicht" action="#{moneyTransportModel.goToCustomerOverviewScreen}" />
+                    </h:panelGrid>
+                </h:form>
+            </f:view>
+        </ui:define>
+    </ui:composition>
+</h:body>
+</html>

@@ -4,10 +4,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
-<!-- Ganz wichtig: Wenn Daten zum Server geschickt werden sollen, IMMER form hinzufügen!
-// Ganz wichtig: Bei neuem Facelet IMMER body hinzufügen! -->
+
 
 <h:body>
     <ui:composition template="../../WEB-INF/templates/basicTemplate.xhtml">
@@ -28,13 +28,17 @@
                 <h:panelGrid rendered="#{customerModel.recentlyLoggedIn}" columns="1">
                     <h:outputText value="Hier standen bei der Registrierung deine TAN-Nummern. Ich hoffe, du hast dir diese aufgeschrieben ... " />
                 </h:panelGrid>
+                <h:outputText value="Sollten dir die TANs ausgehen oder falls du deine Nummern vergessen hast, kannst du einfach neue TANs generieren lassen: " />
+                <p:commandButton value="Neue TANs generieren" action="#{customerModel.goToTanGenerationScreen}" />
             </f:view>
         </ui:define>
         <ui:define name="content">
             <f:view>
                 <h:form>
-                    <h2>Dein Geldtransport wurde erfolgreich in Auftrag gegeben!</h2>
-                    <h:commandButton value="Zur Übersicht" action="#{moneyTransportModel.goToCustomerOverviewScreen}"/>
+                    <h:panelGrid>
+                        <h2>Dein Geldtransport wurde erfolgreich in Auftrag gegeben!</h2>
+                        <p:commandButton value="Zur Übersicht" action="#{moneyTransportModel.goToCustomerOverviewScreen}"/>
+                    </h:panelGrid>
                 </h:form>
             </f:view>
         </ui:define>

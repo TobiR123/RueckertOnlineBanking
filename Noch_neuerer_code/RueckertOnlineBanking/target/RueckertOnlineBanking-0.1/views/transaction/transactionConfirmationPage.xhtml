@@ -4,10 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
-
-<!-- Ganz wichtig: Wenn Daten zum Server geschickt werden sollen, IMMER form hinzufügen!
-// Ganz wichtig: Bei neuem Facelet IMMER body hinzufügen! -->
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
 <h:body>
     <ui:composition template="../../WEB-INF/templates/basicTemplate.xhtml">
@@ -28,36 +26,38 @@
                 <h:panelGrid rendered="#{customerModel.recentlyLoggedIn}" columns="1">
                     <h:outputText value="Hier standen bei der Registrierung deine TAN-Nummern. Ich hoffe, du hast dir diese aufgeschrieben ... " />
                 </h:panelGrid>
+                <h:outputText value="Sollten dir die TANs ausgehen oder falls du deine Nummern vergessen hast, kannst du einfach neue TANs generieren lassen: " />
+                <p:commandButton value="Neue TANs generieren" action="#{customerModel.goToTanGenerationScreen}" />
             </f:view>
         </ui:define>
         <ui:define name="content">
             <f:view>
                 <h:form>
-                    <h2>Folgende Transaktion wurde erfolgreich ausgeführt:</h2>
-                    <h:panelGrid columns="2">
-                        <h:outputText value="Sender-IBAN:" />
-                        <h:outputText value="#{transactionModel.selectedSenderAccount.iban}" />
+                    <h:panelGrid>
+                        <h2>Folgende Transaktion wurde erfolgreich ausgeführt:</h2>
+                        <h:panelGrid columns="2">
+                            <h:outputText value="Sender-IBAN:" />
+                            <h:outputText value="#{transactionModel.selectedSenderAccount.iban}" />
 
-                        <h:outputText value="Sender-BIC:" />
-                        <h:outputText value="#{transactionModel.selectedSenderAccount.bic}" />
+                            <h:outputText value="Sender-BIC:" />
+                            <h:outputText value="#{transactionModel.selectedSenderAccount.bic}" />
 
-                        <h:outputText value="Empfänger-IBAN:" />
-                        <h:outputText value="#{transactionModel.receiverIban}"/>
+                            <h:outputText value="Empfänger-IBAN:" />
+                            <h:outputText value="#{transactionModel.receiverIban}"/>
 
-                        <h:outputText value="Empfänger-BIC:" />
-                        <h:outputText value="#{transactionModel.receiverBic}"/>
+                            <h:outputText value="Empfänger-BIC:" />
+                            <h:outputText value="#{transactionModel.receiverBic}"/>
 
-                        <h:outputText value="Betrag:" />
-                        <h:outputText value="#{transactionModel.amount}"/>
+                            <h:outputText value="Betrag:" />
+                            <h:outputText value="#{transactionModel.amount}"/>
 
-                        <h:outputText value="Überweisungszweck:" />
-                        <h:outputText value="#{transactionModel.description}"/>
+                            <h:outputText value="Überweisungszweck:" />
+                            <h:outputText value="#{transactionModel.description}"/>
 
-                        <h:outputText value="Bestätigungs-TAN:" />
-                        <h:outputText value="#{transactionModel.tanNumber.tanNumber}"/>
-                    </h:panelGrid>
-                    <h:panelGrid columns="1">
-                        <h:commandButton value="Weiter" action="#{transactionModel.goToCustomerOverviewScreen}"/>
+                            <h:outputText value="Bestätigungs-TAN:" />
+                            <h:outputText value="#{transactionModel.tanNumber.tanNumber}"/>
+                        </h:panelGrid>
+                        <p:commandButton value="Weiter" action="#{transactionModel.goToCustomerOverviewScreen}"/>
                     </h:panelGrid>
                 </h:form>
             </f:view>
